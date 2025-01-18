@@ -1,0 +1,6 @@
+resource "github_repository" "{{ repository_name }}" {
+  name               = "{{ repository_name }}"
+  description        = "{{ description }}"
+  visibility         = "{{ visibility }}"
+  gitignore_template = "{{ gitignore_template }}"
+}

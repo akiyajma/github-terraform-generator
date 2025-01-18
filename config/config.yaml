@@ -1,0 +1,9 @@
+template_dir: "templates"
+output_dir: "terraform"
+tfstate_file: "terraform.tfstate"
+state_file: "existing_resources.json"
+default_repository:
+  visibility: "public"
+default_team:
+  privacy: "closed"
+  role: "member"

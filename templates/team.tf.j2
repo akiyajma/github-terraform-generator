@@ -1,0 +1,13 @@
+resource "github_team" "{{ team_name }}" {
+  name        = "{{ team_name }}"
+  description = "{{ description }}"
+  privacy     = "{{ privacy }}"
+}
+
+{% for member in members %}
+resource "github_team_membership" "{{ team_name }}_{{ member.username }}" {
+  team_id  = github_team.{{ team_name }}.id
+  username = "{{ member.username }}"
+  role     = "{{ member.role }}"
+}
+{% endfor %}
