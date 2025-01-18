@@ -31,9 +31,9 @@ jobs:
       - name: Generate documentation (main branch)
         if: github.ref_name == 'main'
         run: |
-          mkdir -p temp-docs
-          pdoc --html --output-dir temp-docs --force .
-          mv temp-docs/* docs/
+          mkdir temp-docs
+          pdoc --html --output-dir temp-docs --force .  
+          rysnc -av temp-docs/github-terraform-generator/ docs/
           rm -rf temp-docs
 
       - name: Commit and push documentation
