@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>utils.tfstate_loader API documentation</title>
+<title>github-terraform-generator.utils.tfstate_loader API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,7 +33,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>utils.tfstate_loader</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.utils.tfstate_loader</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -44,7 +44,7 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="utils.tfstate_loader.extract_resources"><code class="name flex">
+<dt id="github-terraform-generator.utils.tfstate_loader.extract_resources"><code class="name flex">
 <span>def <span class="ident">extract_resources</span></span>(<span>tfstate)</span>
 </code></dt>
 <dd>
@@ -162,7 +162,7 @@ a <code>resources</code> key with a list of resource definitions.</dd>
 resources = extract_resources(tfstate)</p>
 <h1 _..._="[...]" _repositories_:="&quot;repositories&quot;:" _teams_:="&quot;teams&quot;:" id="resources-">resources -&gt;</h1></div>
 </dd>
-<dt id="utils.tfstate_loader.load_tfstate"><code class="name flex">
+<dt id="github-terraform-generator.utils.tfstate_loader.load_tfstate"><code class="name flex">
 <span>def <span class="ident">load_tfstate</span></span>(<span>tfstate_file)</span>
 </code></dt>
 <dd>
@@ -222,7 +222,7 @@ resources = extract_resources(tfstate)</p>
 <h2 id="example">Example</h2>
 <p>tfstate = load_tfstate("path/to/terraform.tfstate")</p></div>
 </dd>
-<dt id="utils.tfstate_loader.save_existing_state"><code class="name flex">
+<dt id="github-terraform-generator.utils.tfstate_loader.save_existing_state"><code class="name flex">
 <span>def <span class="ident">save_existing_state</span></span>(<span>state, output_file)</span>
 </code></dt>
 <dd>
@@ -301,14 +301,14 @@ save_existing_state(state, "output/existing_state.json")</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="utils" href="index.html">utils</a></code></li>
+<li><code><a title="github-terraform-generator.utils" href="index.html">github-terraform-generator.utils</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="utils.tfstate_loader.extract_resources" href="#utils.tfstate_loader.extract_resources">extract_resources</a></code></li>
-<li><code><a title="utils.tfstate_loader.load_tfstate" href="#utils.tfstate_loader.load_tfstate">load_tfstate</a></code></li>
-<li><code><a title="utils.tfstate_loader.save_existing_state" href="#utils.tfstate_loader.save_existing_state">save_existing_state</a></code></li>
+<li><code><a title="github-terraform-generator.utils.tfstate_loader.extract_resources" href="#github-terraform-generator.utils.tfstate_loader.extract_resources">extract_resources</a></code></li>
+<li><code><a title="github-terraform-generator.utils.tfstate_loader.load_tfstate" href="#github-terraform-generator.utils.tfstate_loader.load_tfstate">load_tfstate</a></code></li>
+<li><code><a title="github-terraform-generator.utils.tfstate_loader.save_existing_state" href="#github-terraform-generator.utils.tfstate_loader.save_existing_state">save_existing_state</a></code></li>
 </ul>
 </li>
 </ul>

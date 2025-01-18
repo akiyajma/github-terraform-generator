@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>generator API documentation</title>
+<title>github-terraform-generator.generator API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,22 +33,22 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>generator</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.generator</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="generator.repository_generator" href="repository_generator.html">generator.repository_generator</a></code></dt>
+<dt><code class="name"><a title="github-terraform-generator.generator.repository_generator" href="repository_generator.html">github-terraform-generator.generator.repository_generator</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="generator.team_generator" href="team_generator.html">generator.team_generator</a></code></dt>
+<dt><code class="name"><a title="github-terraform-generator.generator.team_generator" href="team_generator.html">github-terraform-generator.generator.team_generator</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="generator.terraform_generator" href="terraform_generator.html">generator.terraform_generator</a></code></dt>
+<dt><code class="name"><a title="github-terraform-generator.generator.terraform_generator" href="terraform_generator.html">github-terraform-generator.generator.terraform_generator</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -59,7 +59,7 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="generator.generate_repository"><code class="name flex">
+<dt id="github-terraform-generator.generator.generate_repository"><code class="name flex">
 <span>def <span class="ident">generate_repository</span></span>(<span>repository, template_dir: str, output_dir: str)</span>
 </code></dt>
 <dd>
@@ -165,8 +165,8 @@ or a dictionary with the following keys:
 <li>The generated file will be saved with the name <code>&lt;repository_name&gt;_repository.tf</code> in <code>output_dir</code>.</li>
 </ul></div>
 </dd>
-<dt id="generator.generate_team"><code class="name flex">
-<span>def <span class="ident">generate_team</span></span>(<span>team: <a title="models.team.Team" href="../models/team.html#models.team.Team">Team</a>,<br>template_dir: str,<br>output_dir: str)</span>
+<dt id="github-terraform-generator.generator.generate_team"><code class="name flex">
+<span>def <span class="ident">generate_team</span></span>(<span>team: models.team.Team, template_dir: str, output_dir: str)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -278,7 +278,7 @@ is represented as a dictionary with <code>username</code> and <code>role</code> 
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="generator.TerraformGenerator"><code class="flex name class">
+<dt id="github-terraform-generator.generator.TerraformGenerator"><code class="flex name class">
 <span>class <span class="ident">TerraformGenerator</span></span>
 <span>(</span><span>template_dir: str, output_dir: str)</span>
 </code></dt>
@@ -430,7 +430,7 @@ and generating Terraform configuration files by rendering Jinja2 templates.</p>
 </code></pre></div>
 <h3>Methods</h3>
 <dl>
-<dt id="generator.TerraformGenerator.generate_repository"><code class="name flex">
+<dt id="github-terraform-generator.generator.TerraformGenerator.generate_repository"><code class="name flex">
 <span>def <span class="ident">generate_repository</span></span>(<span>self, repository)</span>
 </code></dt>
 <dd>
@@ -512,7 +512,7 @@ dictionary, or a list of dictionaries containing attributes:
 ])
 </code></pre></div>
 </dd>
-<dt id="generator.TerraformGenerator.generate_team"><code class="name flex">
+<dt id="github-terraform-generator.generator.TerraformGenerator.generate_team"><code class="name flex">
 <span>def <span class="ident">generate_team</span></span>(<span>self, team)</span>
 </code></dt>
 <dd>
@@ -597,26 +597,31 @@ is represented as a dictionary with <code>username</code> and <code>role</code> 
 <ul></ul>
 </div>
 <ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="github-terraform-generator" href="../index.html">github-terraform-generator</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="generator.repository_generator" href="repository_generator.html">generator.repository_generator</a></code></li>
-<li><code><a title="generator.team_generator" href="team_generator.html">generator.team_generator</a></code></li>
-<li><code><a title="generator.terraform_generator" href="terraform_generator.html">generator.terraform_generator</a></code></li>
+<li><code><a title="github-terraform-generator.generator.repository_generator" href="repository_generator.html">github-terraform-generator.generator.repository_generator</a></code></li>
+<li><code><a title="github-terraform-generator.generator.team_generator" href="team_generator.html">github-terraform-generator.generator.team_generator</a></code></li>
+<li><code><a title="github-terraform-generator.generator.terraform_generator" href="terraform_generator.html">github-terraform-generator.generator.terraform_generator</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="generator.generate_repository" href="#generator.generate_repository">generate_repository</a></code></li>
-<li><code><a title="generator.generate_team" href="#generator.generate_team">generate_team</a></code></li>
+<li><code><a title="github-terraform-generator.generator.generate_repository" href="#github-terraform-generator.generator.generate_repository">generate_repository</a></code></li>
+<li><code><a title="github-terraform-generator.generator.generate_team" href="#github-terraform-generator.generator.generate_team">generate_team</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="generator.TerraformGenerator" href="#generator.TerraformGenerator">TerraformGenerator</a></code></h4>
+<h4><code><a title="github-terraform-generator.generator.TerraformGenerator" href="#github-terraform-generator.generator.TerraformGenerator">TerraformGenerator</a></code></h4>
 <ul class="">
-<li><code><a title="generator.TerraformGenerator.generate_repository" href="#generator.TerraformGenerator.generate_repository">generate_repository</a></code></li>
-<li><code><a title="generator.TerraformGenerator.generate_team" href="#generator.TerraformGenerator.generate_team">generate_team</a></code></li>
+<li><code><a title="github-terraform-generator.generator.TerraformGenerator.generate_repository" href="#github-terraform-generator.generator.TerraformGenerator.generate_repository">generate_repository</a></code></li>
+<li><code><a title="github-terraform-generator.generator.TerraformGenerator.generate_team" href="#github-terraform-generator.generator.TerraformGenerator.generate_team">generate_team</a></code></li>
 </ul>
 </li>
 </ul>

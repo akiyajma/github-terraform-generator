@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>utils.process_resources API documentation</title>
+<title>github-terraform-generator.utils.process_resources API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,7 +33,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>utils.process_resources</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.utils.process_resources</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -44,7 +44,7 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="utils.process_resources.process_repositories"><code class="name flex">
+<dt id="github-terraform-generator.utils.process_resources.process_repositories"><code class="name flex">
 <span>def <span class="ident">process_repositories</span></span>(<span>generator, output_dir, repos_to_add, repos_to_update, repos_to_delete)</span>
 </code></dt>
 <dd>
@@ -142,8 +142,8 @@ repos_to_update=[{"repository_name": "repo2", "visibility": "private"}],
 repos_to_delete=[{"repository_name": "repo3"}]
 )</p></div>
 </dd>
-<dt id="utils.process_resources.process_resources"><code class="name flex">
-<span>def <span class="ident">process_resources</span></span>(<span>template_dir,<br>output_dir,<br>resource_changes: <a title="utils.resource_changes.ResourceChanges" href="resource_changes.html#utils.resource_changes.ResourceChanges">ResourceChanges</a>)</span>
+<dt id="github-terraform-generator.utils.process_resources.process_resources"><code class="name flex">
+<span>def <span class="ident">process_resources</span></span>(<span>template_dir,<br>output_dir,<br>resource_changes: utils.resource_changes.ResourceChanges)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -227,7 +227,7 @@ teams_to_delete=[{"team_name": "team2"}]
 )
 process_resources(template_dir="templates", output_dir="output", resource_changes=resource_changes)</p></div>
 </dd>
-<dt id="utils.process_resources.process_teams"><code class="name flex">
+<dt id="github-terraform-generator.utils.process_resources.process_teams"><code class="name flex">
 <span>def <span class="ident">process_teams</span></span>(<span>generator, output_dir, teams_to_add, teams_to_update, teams_to_delete)</span>
 </code></dt>
 <dd>
@@ -337,14 +337,14 @@ teams_to_delete=[{"team_name": "team3"}]
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="utils" href="index.html">utils</a></code></li>
+<li><code><a title="github-terraform-generator.utils" href="index.html">github-terraform-generator.utils</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="utils.process_resources.process_repositories" href="#utils.process_resources.process_repositories">process_repositories</a></code></li>
-<li><code><a title="utils.process_resources.process_resources" href="#utils.process_resources.process_resources">process_resources</a></code></li>
-<li><code><a title="utils.process_resources.process_teams" href="#utils.process_resources.process_teams">process_teams</a></code></li>
+<li><code><a title="github-terraform-generator.utils.process_resources.process_repositories" href="#github-terraform-generator.utils.process_resources.process_repositories">process_repositories</a></code></li>
+<li><code><a title="github-terraform-generator.utils.process_resources.process_resources" href="#github-terraform-generator.utils.process_resources.process_resources">process_resources</a></code></li>
+<li><code><a title="github-terraform-generator.utils.process_resources.process_teams" href="#github-terraform-generator.utils.process_resources.process_teams">process_teams</a></code></li>
 </ul>
 </li>
 </ul>
