@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>utils.tfstate_loader API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>utils.tfstate_loader</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="utils.tfstate_loader.extract_resources"><code class="name flex">
+<span>def <span class="ident">extract_resources</span></span>(<span>tfstate)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_resources(tfstate):
+    &#34;&#34;&#34;
+    Extract lists of repositories and teams from the Terraform state.
+
+    This function processes the Terraform state dictionary and identifies
+    resources of type `github_repository` and `github_team`, extracting their
+    relevant attributes.
+
+    Args:
+        tfstate (dict): The Terraform state dictionary, which typically contains
+            a `resources` key with a list of resource definitions.
+
+    Returns:
+        dict: A dictionary containing two keys:
+            - &#34;repositories&#34; (list[dict]): A list of repositories with attributes like
+              `repository_name`, `description`, and `visibility`.
+            - &#34;teams&#34; (list[dict]): A list of teams with attributes like `team_name`,
+              `description`, `privacy`, and `members`.
+
+    Raises:
+        KeyError: If expected keys are missing in the Terraform state.
+        Exception: For other unexpected errors during resource extraction.
+
+    Example:
+        tfstate = {
+            &#34;resources&#34;: [
+                {
+                    &#34;type&#34;: &#34;github_repository&#34;,
+                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;}}]
+                },
+                {
+                    &#34;type&#34;: &#34;github_team&#34;,
+                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;}}]
+                }
+            ]
+        }
+        resources = extract_resources(tfstate)
+        # resources -&gt; {&#34;repositories&#34;: [...], &#34;teams&#34;: [...]}
+    &#34;&#34;&#34;
+    try:
+        repositories = []
+        teams = []
+
+        for resource in tfstate.get(&#34;resources&#34;, []):
+            if resource[&#34;type&#34;] == &#34;github_repository&#34;:
+                for instance in resource.get(&#34;instances&#34;, []):
+                    attributes = instance.get(&#34;attributes&#34;, {})
+                    repositories.append({
+                        &#34;repository_name&#34;: attributes[&#34;name&#34;],
+                        &#34;description&#34;: attributes.get(&#34;description&#34;, &#34;&#34;),
+                        &#34;visibility&#34;: attributes[&#34;visibility&#34;]
+                    })
+            elif resource[&#34;type&#34;] == &#34;github_team&#34;:
+                for instance in resource.get(&#34;instances&#34;, []):
+                    attributes = instance.get(&#34;attributes&#34;, {})
+                    teams.append({
+                        &#34;team_name&#34;: attributes[&#34;name&#34;],
+                        &#34;description&#34;: attributes.get(&#34;description&#34;, &#34;&#34;),
+                        &#34;privacy&#34;: attributes[&#34;privacy&#34;],
+                        &#34;members&#34;: []  # Add members if present in future requirements
+                    })
+
+        return {&#34;repositories&#34;: repositories, &#34;teams&#34;: teams}
+    except KeyError as e:
+        raise KeyError(f&#34;Missing expected key in tfstate: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error extracting resources: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Extract lists of repositories and teams from the Terraform state.</p>
+<p>This function processes the Terraform state dictionary and identifies
+resources of type <code>github_repository</code> and <code>github_team</code>, extracting their
+relevant attributes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tfstate</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The Terraform state dictionary, which typically contains
+a <code>resources</code> key with a list of resource definitions.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing two keys:
+- "repositories" (list[dict]): A list of repositories with attributes like
+<code>repository_name</code>, <code>description</code>, and <code>visibility</code>.
+- "teams" (list[dict]): A list of teams with attributes like <code>team_name</code>,
+<code>description</code>, <code>privacy</code>, and <code>members</code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>If expected keys are missing in the Terraform state.</dd>
+<dt><code>Exception</code></dt>
+<dd>For other unexpected errors during resource extraction.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>tfstate = {
+"resources": [
+{
+"type": "github_repository",
+"instances": [{"attributes": {"name": "repo1", "visibility": "public"}}]
+},
+{
+"type": "github_team",
+"instances": [{"attributes": {"name": "team1", "privacy": "closed"}}]
+}
+]
+}
+resources = extract_resources(tfstate)</p>
+<h1 _..._="[...]" _repositories_:="&quot;repositories&quot;:" _teams_:="&quot;teams&quot;:" id="resources-">resources -&gt;</h1></div>
+</dd>
+<dt id="utils.tfstate_loader.load_tfstate"><code class="name flex">
+<span>def <span class="ident">load_tfstate</span></span>(<span>tfstate_file)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_tfstate(tfstate_file):
+    &#34;&#34;&#34;
+    Load and parse the Terraform state file in JSON format.
+
+    Args:
+        tfstate_file (str): The file path to the Terraform state file.
+
+    Returns:
+        dict: The parsed Terraform state as a Python dictionary.
+
+    Raises:
+        FileNotFoundError: If the specified tfstate file does not exist.
+        json.JSONDecodeError: If the tfstate file contains invalid JSON content.
+        Exception: For other unexpected errors during file reading or parsing.
+
+    Example:
+        tfstate = load_tfstate(&#34;path/to/terraform.tfstate&#34;)
+    &#34;&#34;&#34;
+    try:
+        with open(tfstate_file, &#34;r&#34;) as f:
+            return json.load(f)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f&#34;tfstate file not found: {e}&#34;)
+    except json.JSONDecodeError as e:
+        raise json.JSONDecodeError(
+            f&#34;Invalid JSON format in {tfstate_file}: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error loading tfstate: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Load and parse the Terraform state file in JSON format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tfstate_file</code></strong> :&ensp;<code>str</code></dt>
+<dd>The file path to the Terraform state file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>The parsed Terraform state as a Python dictionary.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the specified tfstate file does not exist.</dd>
+<dt><code>json.JSONDecodeError</code></dt>
+<dd>If the tfstate file contains invalid JSON content.</dd>
+<dt><code>Exception</code></dt>
+<dd>For other unexpected errors during file reading or parsing.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>tfstate = load_tfstate("path/to/terraform.tfstate")</p></div>
+</dd>
+<dt id="utils.tfstate_loader.save_existing_state"><code class="name flex">
+<span>def <span class="ident">save_existing_state</span></span>(<span>state, output_file)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_existing_state(state, output_file):
+    &#34;&#34;&#34;
+    Save the current state of resources to a file in JSON format.
+
+    This function ensures the output directory exists and writes the given state
+    as a JSON file to the specified file path.
+
+    Args:
+        state (dict): The current state of resources to be saved, typically including
+            lists of repositories and teams.
+        output_file (str): The file path where the state will be saved.
+
+    Raises:
+        OSError: If there is an error creating the output directory or writing the file.
+        Exception: For other unexpected errors during the save operation.
+
+    Example:
+        state = {
+            &#34;repositories&#34;: [{&#34;repository_name&#34;: &#34;repo1&#34;}],
+            &#34;teams&#34;: [{&#34;team_name&#34;: &#34;team1&#34;}]
+        }
+        save_existing_state(state, &#34;output/existing_state.json&#34;)
+    &#34;&#34;&#34;
+    try:
+        output_dir = os.path.dirname(output_file)
+        os.makedirs(output_dir, exist_ok=True)
+        with open(output_file, &#34;w&#34;) as f:
+            json.dump(state, f, indent=2)
+        logger.info(f&#34;Existing resources saved to {output_file}&#34;)
+    except OSError as e:
+        raise OSError(f&#34;Failed to save existing state to {output_file}: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error saving existing state: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Save the current state of resources to a file in JSON format.</p>
+<p>This function ensures the output directory exists and writes the given state
+as a JSON file to the specified file path.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The current state of resources to be saved, typically including
+lists of repositories and teams.</dd>
+<dt><strong><code>output_file</code></strong> :&ensp;<code>str</code></dt>
+<dd>The file path where the state will be saved.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>OSError</code></dt>
+<dd>If there is an error creating the output directory or writing the file.</dd>
+<dt><code>Exception</code></dt>
+<dd>For other unexpected errors during the save operation.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>state = {
+"repositories": [{"repository_name": "repo1"}],
+"teams": [{"team_name": "team1"}]
+}
+save_existing_state(state, "output/existing_state.json")</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="utils" href="index.html">utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="utils.tfstate_loader.extract_resources" href="#utils.tfstate_loader.extract_resources">extract_resources</a></code></li>
+<li><code><a title="utils.tfstate_loader.load_tfstate" href="#utils.tfstate_loader.load_tfstate">load_tfstate</a></code></li>
+<li><code><a title="utils.tfstate_loader.save_existing_state" href="#utils.tfstate_loader.save_existing_state">save_existing_state</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>

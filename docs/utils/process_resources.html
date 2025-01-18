@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>utils.process_resources API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>utils.process_resources</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="utils.process_resources.process_repositories"><code class="name flex">
+<span>def <span class="ident">process_repositories</span></span>(<span>generator, output_dir, repos_to_add, repos_to_update, repos_to_delete)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_repositories(generator, output_dir, repos_to_add, repos_to_update, repos_to_delete):
+    &#34;&#34;&#34;
+    Handle the lifecycle of repositories: addition, update, and deletion.
+
+    This function generates Terraform files for new or updated repositories and removes
+    Terraform files for deleted repositories.
+
+    Args:
+        generator (TerraformGenerator): The generator instance used to create Terraform files.
+        output_dir (str): The directory where Terraform files are generated or deleted.
+        repos_to_add (list[dict]): A list of repositories to add, represented as dictionaries.
+        repos_to_update (list[dict]): A list of repositories to update, represented as dictionaries.
+        repos_to_delete (list[dict]): A list of repositories to delete, represented as dictionaries.
+
+    Raises:
+        Exception: If an error occurs during any repository operation (add, update, delete).
+
+    Example:
+        process_repositories(
+            generator=TerraformGenerator(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;),
+            output_dir=&#34;output&#34;,
+            repos_to_add=[{&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;}],
+            repos_to_update=[{&#34;repository_name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;}],
+            repos_to_delete=[{&#34;repository_name&#34;: &#34;repo3&#34;}]
+        )
+    &#34;&#34;&#34;
+    try:
+        # Process additions
+        for repo in repos_to_add:
+            try:
+                generator.generate_repository(repo)
+            except Exception as e:
+                raise Exception(f&#34;Error adding repository &#39;{
+                                repo.get(&#39;repository_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
+        # Process updates
+        for repo in repos_to_update:
+            try:
+                generator.generate_repository(repo)
+            except Exception as e:
+                raise Exception(f&#34;Error updating repository &#39;{
+                                repo.get(&#39;repository_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
+        # Process deletions
+        for repo in repos_to_delete:
+            try:
+                tf_file = os.path.join(
+                    output_dir, f&#34;{repo[&#39;repository_name&#39;]}_repository.tf&#34;)
+                if os.path.exists(tf_file):
+                    os.remove(tf_file)
+                    logger.info(f&#34;Deleted Terraform file: {tf_file}&#34;)
+                else:
+                    logger.warning(
+                        f&#34;Terraform file not found for deletion: {tf_file}&#34;)
+            except Exception as e:
+                raise Exception(f&#34;Error deleting repository &#39;{
+                                repo.get(&#39;repository_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error processing repositories: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Handle the lifecycle of repositories: addition, update, and deletion.</p>
+<p>This function generates Terraform files for new or updated repositories and removes
+Terraform files for deleted repositories.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>generator</code></strong> :&ensp;<code>TerraformGenerator</code></dt>
+<dd>The generator instance used to create Terraform files.</dd>
+<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>The directory where Terraform files are generated or deleted.</dd>
+<dt><strong><code>repos_to_add</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of repositories to add, represented as dictionaries.</dd>
+<dt><strong><code>repos_to_update</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of repositories to update, represented as dictionaries.</dd>
+<dt><strong><code>repos_to_delete</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of repositories to delete, represented as dictionaries.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>If an error occurs during any repository operation (add, update, delete).</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>process_repositories(
+generator=TerraformGenerator(template_dir="templates", output_dir="output"),
+output_dir="output",
+repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
+repos_to_update=[{"repository_name": "repo2", "visibility": "private"}],
+repos_to_delete=[{"repository_name": "repo3"}]
+)</p></div>
+</dd>
+<dt id="utils.process_resources.process_resources"><code class="name flex">
+<span>def <span class="ident">process_resources</span></span>(<span>template_dir,<br>output_dir,<br>resource_changes: <a title="utils.resource_changes.ResourceChanges" href="resource_changes.html#utils.resource_changes.ResourceChanges">ResourceChanges</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_resources(template_dir, output_dir, resource_changes: ResourceChanges):
+    &#34;&#34;&#34;
+    Orchestrate the processing of repositories and teams for addition, update, and deletion.
+
+    This function delegates repository and team operations to the respective helper functions.
+
+    Args:
+        template_dir (str): The directory containing Jinja2 templates for Terraform files.
+        output_dir (str): The directory where Terraform files will be generated or deleted.
+        resource_changes (ResourceChanges): An object containing changes to repositories and teams.
+
+    Raises:
+        Exception: If an error occurs during repository or team processing.
+
+    Example:
+        resource_changes = ResourceChanges(
+            repos_to_add=[{&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;}],
+            repos_to_update=[{&#34;repository_name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;}],
+            repos_to_delete=[{&#34;repository_name&#34;: &#34;repo3&#34;}],
+            teams_to_add=[{&#34;team_name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;}],
+            teams_to_update=[],
+            teams_to_delete=[{&#34;team_name&#34;: &#34;team2&#34;}]
+        )
+        process_resources(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;, resource_changes=resource_changes)
+    &#34;&#34;&#34;
+    try:
+        generator = TerraformGenerator(template_dir, output_dir)
+
+        # Delegate repository processing
+        process_repositories(
+            generator,
+            output_dir,
+            resource_changes.repos_to_add,
+            resource_changes.repos_to_update,
+            resource_changes.repos_to_delete,
+        )
+
+        # Delegate team processing
+        process_teams(
+            generator,
+            output_dir,
+            resource_changes.teams_to_add,
+            resource_changes.teams_to_update,
+            resource_changes.teams_to_delete,
+        )
+
+        logger.info(&#34;Resource processing completed successfully.&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Resource processing failed: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Orchestrate the processing of repositories and teams for addition, update, and deletion.</p>
+<p>This function delegates repository and team operations to the respective helper functions.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>The directory containing Jinja2 templates for Terraform files.</dd>
+<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>The directory where Terraform files will be generated or deleted.</dd>
+<dt><strong><code>resource_changes</code></strong> :&ensp;<code>ResourceChanges</code></dt>
+<dd>An object containing changes to repositories and teams.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>If an error occurs during repository or team processing.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>resource_changes = ResourceChanges(
+repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
+repos_to_update=[{"repository_name": "repo2", "visibility": "private"}],
+repos_to_delete=[{"repository_name": "repo3"}],
+teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
+teams_to_update=[],
+teams_to_delete=[{"team_name": "team2"}]
+)
+process_resources(template_dir="templates", output_dir="output", resource_changes=resource_changes)</p></div>
+</dd>
+<dt id="utils.process_resources.process_teams"><code class="name flex">
+<span>def <span class="ident">process_teams</span></span>(<span>generator, output_dir, teams_to_add, teams_to_update, teams_to_delete)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to_delete):
+    &#34;&#34;&#34;
+    Handle the lifecycle of teams: addition, update, and deletion.
+
+    This function generates Terraform files for new or updated teams and removes
+    Terraform files for deleted teams.
+
+    Args:
+        generator (TerraformGenerator): The generator instance used to create Terraform files.
+        output_dir (str): The directory where Terraform files are generated or deleted.
+        teams_to_add (list[dict]): A list of teams to add, represented as dictionaries.
+        teams_to_update (list[dict]): A list of teams to update, represented as dictionaries.
+        teams_to_delete (list[dict]): A list of teams to delete, represented as dictionaries.
+
+    Raises:
+        Exception: If an error occurs during any team operation (add, update, delete).
+
+    Example:
+        process_teams(
+            generator=TerraformGenerator(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;),
+            output_dir=&#34;output&#34;,
+            teams_to_add=[{&#34;team_name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;}],
+            teams_to_update=[{&#34;team_name&#34;: &#34;team2&#34;, &#34;privacy&#34;: &#34;open&#34;}],
+            teams_to_delete=[{&#34;team_name&#34;: &#34;team3&#34;}]
+        )
+    &#34;&#34;&#34;
+    try:
+        # Process additions
+        for team in teams_to_add:
+            try:
+                generator.generate_team(team)
+            except Exception as e:
+                raise Exception(f&#34;Error adding team &#39;{
+                                team.get(&#39;team_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
+        # Process updates
+        for team in teams_to_update:
+            try:
+                generator.generate_team(team)
+            except Exception as e:
+                raise Exception(f&#34;Error updating team &#39;{
+                                team.get(&#39;team_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
+        # Process deletions
+        for team in teams_to_delete:
+            try:
+                tf_file = os.path.join(
+                    output_dir, f&#34;{team[&#39;team_name&#39;]}_team.tf&#34;)
+                if os.path.exists(tf_file):
+                    os.remove(tf_file)
+                    logger.info(f&#34;Deleted Terraform file: {tf_file}&#34;)
+                else:
+                    logger.warning(
+                        f&#34;Terraform file not found for deletion: {tf_file}&#34;)
+            except Exception as e:
+                raise Exception(f&#34;Error deleting team &#39;{
+                                team.get(&#39;team_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error processing teams: {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Handle the lifecycle of teams: addition, update, and deletion.</p>
+<p>This function generates Terraform files for new or updated teams and removes
+Terraform files for deleted teams.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>generator</code></strong> :&ensp;<code>TerraformGenerator</code></dt>
+<dd>The generator instance used to create Terraform files.</dd>
+<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>The directory where Terraform files are generated or deleted.</dd>
+<dt><strong><code>teams_to_add</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of teams to add, represented as dictionaries.</dd>
+<dt><strong><code>teams_to_update</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of teams to update, represented as dictionaries.</dd>
+<dt><strong><code>teams_to_delete</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>A list of teams to delete, represented as dictionaries.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>If an error occurs during any team operation (add, update, delete).</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>process_teams(
+generator=TerraformGenerator(template_dir="templates", output_dir="output"),
+output_dir="output",
+teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
+teams_to_update=[{"team_name": "team2", "privacy": "open"}],
+teams_to_delete=[{"team_name": "team3"}]
+)</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="utils" href="index.html">utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="utils.process_resources.process_repositories" href="#utils.process_resources.process_repositories">process_repositories</a></code></li>
+<li><code><a title="utils.process_resources.process_resources" href="#utils.process_resources.process_resources">process_resources</a></code></li>
+<li><code><a title="utils.process_resources.process_teams" href="#utils.process_resources.process_teams">process_teams</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>
