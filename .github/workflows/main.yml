@@ -31,8 +31,10 @@ jobs:
       - name: Generate documentation (main branch)
         if: github.ref_name == 'main'
         run: |
-          mkdir -p docs
-          pdoc --html --output-dir docs --force .
+          mkdir -p temp-docs
+          pdoc --html --output-dir temp-docs --force .
+          mv temp-docs/* docs/
+          rm -rf temp-docs
 
       - name: Commit and push documentation
         if: github.ref_name == 'main'
