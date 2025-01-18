@@ -99,10 +99,10 @@ This project provides a tool to generate Terraform files for provisioning GitHub
 
 The configuration file [`config/config.yaml`](config/config.yaml ) contains the following settings:
 
-- [`template_dir`](generator/repository_generator.py ): Directory containing the Jinja2 templates.
-- [`output_dir`](generator/repository_generator.py ): Directory where the generated Terraform files will be saved.
-- [`tfstate_file`](main.py ): Path to the Terraform state file.
-- [`state_file`](main.py ): Path to the file where the existing state will be saved.
+- `template_dir`: Directory containing the Jinja2 templates.
+- `output_dir`: Directory where the generated Terraform files will be saved.
+- `tfstate_file`: Path to the Terraform state file.
+- `state_file`: Path to the file where the existing state will be saved.
 - `default_repository`: Default settings for repositories.
 - `default_team`: Default settings for teams.
 
@@ -182,5 +182,5 @@ Documentation is generated and available in the docs/ directory. It includes det
 
 To generate the documentation in Markdown format, run the following command:
 ```python
-python -m pdoc --output-dir docs --force config generator models tests utils main logging_config
+python -m pdoc --html --output-dir temp-docs --force .  
 ```
