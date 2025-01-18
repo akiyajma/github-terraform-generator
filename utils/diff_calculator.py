@@ -1,32 +1,77 @@
 def calculate_diff(existing, requested, key):
     """
-    Calculate the difference between existing and requested resources (identify updates, additions, and deletions).
+    Calculate differences between existing and requested resources.
+
+    This function compares the existing and requested resource lists, identifying
+    resources to add, update, or delete based on a unique key.
 
     Args:
-        existing (list[dict]): A list of existing resources.
-        requested (list[PydanticModel]): A list of requested new resources.
-        key (str): The key to uniquely identify resources.
+        existing (list[dict]): A list of dictionaries representing existing resources.
+            Each dictionary must include the specified `key` to uniquely identify the resource.
+        requested (list[PydanticModel]): A list of Pydantic models representing the desired state
+            of resources. Each model must include the specified `key`.
+        key (str): The key used to uniquely identify resources in both lists.
 
     Returns:
-        tuple: A tuple containing three lists - to_update, to_add, and to_delete.
+        tuple: A tuple of three lists:
+            - `to_add` (list): Resources in `requested` but not in `existing`.
+            - `to_update` (list): Resources in `requested` with the same key but differing values in `existing`.
+            - `to_delete` (list): Resources in `existing` but not in `requested`.
+
+    Raises:
+        KeyError: If `key` is missing in the `existing` resources.
+        AttributeError: If `key` is missing in the `requested` resources.
+        Exception: For other unexpected errors during the comparison process.
+
+    Example:
+        >>> existing = [
+        ...     {"name": "repo1", "visibility": "public"},
+        ...     {"name": "repo2", "visibility": "private"}
+        ... ]
+        >>> requested = [
+        ...     Repository(name="repo1", visibility="private"),
+        ...     Repository(name="repo3", visibility="public")
+        ... ]
+        >>> to_add, to_update, to_delete = calculate_diff(existing, requested, "name")
+        >>> print(to_add)
+        [{'name': 'repo3', 'visibility': 'public'}]
+        >>> print(to_update)
+        [{'name': 'repo1', 'visibility': 'private'}]
+        >>> print(to_delete)
+        [{'name': 'repo2', 'visibility': 'private'}]
+
+    Notes:
+        - The function converts the `existing` list into a dictionary for efficient lookups.
+        - The `requested` list is expected to contain Pydantic models, which are converted
+          to dictionaries using their `model_dump()` method.
+
+    Logs:
+        - Errors encountered during the comparison process, including missing keys or attributes.
+
     """
-    existing_dict = {item[key]: item for item in existing}
-    requested_dict = {getattr(item, key): item.model_dump()
-                      for item in requested}
+    try:
+        # Convert lists to dictionaries using the unique key
+        existing_dict = {item[key]: item for item in existing}
+        requested_dict = {getattr(item, key): item.model_dump()
+                          for item in requested}
 
-    to_update = []
-    for name in requested_dict:
-        if name in existing_dict and existing_dict[name] != requested_dict[name]:
-            to_update.append(requested_dict[name])
+        # Determine additions, updates, and deletions
+        to_add = [requested_dict[name]
+                  for name in requested_dict if name not in existing_dict]
+        to_update = [
+            requested_dict[name]
+            for name in requested_dict
+            if name in existing_dict and existing_dict[name] != requested_dict[name]
+        ]
+        to_delete = [existing_dict[name]
+                     for name in existing_dict if name not in requested_dict]
 
-    to_add = []
-    for name in requested_dict:
-        if name not in existing_dict:
-            to_add.append(requested_dict[name])
-
-    to_delete = []
-    for name in existing_dict:
-        if name not in requested_dict:
-            to_delete.append(existing_dict[name])
-
-    return to_add, to_update, to_delete
+        return to_add, to_update, to_delete
+    except KeyError as e:
+        raise KeyError(f"Missing required key '{
+                       key}' in existing resources: {e}")
+    except AttributeError as e:
+        raise AttributeError(f"Missing required attribute '{
+                             key}' in requested resources: {e}")
+    except Exception as e:
+        raise Exception(f"Error calculating resource differences: {e}")

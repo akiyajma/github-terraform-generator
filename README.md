@@ -174,8 +174,7 @@ terraform-generator/
 ├── pyproject.toml
 ├── README.md
 ├── requirements.in
-├── requirements.txt
-└── rest.py
+└── requirements.txt
 ```
 
 ## Documentation

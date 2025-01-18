@@ -18,7 +18,8 @@ def test_extract_resources():
                         "attributes": {
                             "name": "example-repo",
                             "description": "Example description",
-                            "visibility": "public"
+                            "visibility": "public",
+                            "gitignore_template": "Node"
                         }
                     }
                 ]
