@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir temp-docs
           pdoc --html --output-dir temp-docs --force .  
-          rysnc -av temp-docs/github-terraform-generator/ docs/
+          rsync -av temp-docs/github-terraform-generator/ docs/
           rm -rf temp-docs
 
       - name: Commit and push documentation
