@@ -7,9 +7,12 @@ def test_calculate_diff_add_update_delete():
     Test the calculate_diff function with add, update, and delete cases.
 
     Test Cases:
-    1. Verify that a repository present in 'requested' but not in 'existing' is added.
-    2. Verify that a repository present in both 'existing' and 'requested' but with different attributes is updated.
-    3. Verify that a repository present in 'existing' but not in 'requested' is deleted when allow_delete=True.
+    1. Verify that a repository present in 'requested' but not in 'existing' (e.g., with a new `description`
+       or `gitignore_template`) is correctly identified as to be added.
+    2. Verify that a repository present in both 'existing' and 'requested' but with different attributes 
+       (e.g., `description`, `visibility`) is correctly identified as to be updated.
+    3. Verify that a repository present in 'existing' but marked with `allow_delete=True` in 'requested' 
+       is correctly identified as to be deleted.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -48,7 +51,8 @@ def test_calculate_diff_no_action():
     Test the calculate_diff function with no action required.
 
     Test Cases:
-    1. Verify that no resources are added, updated, or deleted when the requested state matches the existing state.
+    1. Verify that no repositories are added, updated, or deleted when the requested state matches the 
+       existing state exactly, including attributes like `description` and `gitignore_template`.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -69,10 +73,12 @@ def test_calculate_diff_no_action():
 
 def test_calculate_diff_no_delete_without_allow_delete():
     """
-    Test the calculate_diff function with no delete action when allow_delete is False or not set.
+    Test the calculate_diff function to ensure no delete action occurs when `allow_delete` is False or not set.
 
     Test Cases:
-    1. Verify that a resource present in 'existing' but not in 'requested' is not deleted when allow_delete=False or not set.
+    1. Verify that a repository present in 'existing' but not in 'requested' is not marked for deletion 
+       unless `allow_delete=True` is explicitly set in 'requested'.
+    2. Ensure attributes like `description` and `gitignore_template` are irrelevant when considering deletion.
     """
     existing = [
         {"repository_name": "repo1", "description": "Existing repo1",
@@ -95,10 +101,12 @@ def test_calculate_diff_no_delete_without_allow_delete():
 
 def test_calculate_diff_with_only_updates():
     """
-    Test the calculate_diff function with only updates.
+    Test the calculate_diff function to verify updates.
 
     Test Cases:
-    1. Verify that a resource is updated if attributes differ.
+    1. Verify that a repository is marked for update if attributes like `description`, `visibility`, 
+       or `gitignore_template` differ between 'existing' and 'requested'.
+    2. Ensure no repositories are added or deleted if they exist in both states with different attributes.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -121,10 +129,11 @@ def test_calculate_diff_with_only_updates():
 
 def test_calculate_diff_explicit_delete():
     """
-    Test the calculate_diff function with explicit delete action.
+    Test the calculate_diff function to verify explicit delete action.
 
     Test Cases:
-    1. Verify that a resource marked with allow_delete=True in 'requested' is deleted.
+    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in 'requested', even 
+       if other attributes like `description` or `gitignore_template` remain unchanged.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",

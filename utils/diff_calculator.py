@@ -25,20 +25,20 @@ def calculate_diff(existing, requested, key):
 
     Example:
         >>> existing = [
-        ...     {"name": "repo1", "visibility": "public"},
-        ...     {"name": "repo2", "visibility": "private"}
+        ...     {"name": "repo1", "visibility": "public", "description": "First repo", "gitignore_template": "Python"},
+        ...     {"name": "repo2", "visibility": "private", "description": "Second repo", "gitignore_template": "None"}
         ... ]
         >>> requested = [
-        ...     Repository(name="repo1", visibility="private"),
-        ...     Repository(name="repo3", visibility="public")
+        ...     Repository(name="repo1", visibility="private", description="Updated repo", gitignore_template="Go"),
+        ...     Repository(name="repo3", visibility="public", description="New repo", gitignore_template="Java")
         ... ]
         >>> to_add, to_update, to_delete = calculate_diff(existing, requested, "name")
         >>> print(to_add)
-        [{'name': 'repo3', 'visibility': 'public'}]
+        [{'name': 'repo3', 'visibility': 'public', 'description': 'New repo', 'gitignore_template': 'Java'}]
         >>> print(to_update)
-        [{'name': 'repo1', 'visibility': 'private'}]
+        [{'name': 'repo1', 'visibility': 'private', 'description': 'Updated repo', 'gitignore_template': 'Go'}]
         >>> print(to_delete)
-        [{'name': 'repo2', 'visibility': 'private'}]
+        [{'name': 'repo2', 'visibility': 'private', 'description': 'Second repo', 'gitignore_template': 'None'}]
 
     Notes:
         - The function converts the `existing` list into a dictionary for efficient lookups.
@@ -47,7 +47,6 @@ def calculate_diff(existing, requested, key):
 
     Logs:
         - Errors encountered during the comparison process, including missing keys or attributes.
-
     """
     try:
         # Convert lists to dictionaries using the unique key

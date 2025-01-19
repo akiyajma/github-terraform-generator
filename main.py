@@ -26,7 +26,8 @@ def main(output_dir_override=None):
     1. Loads the application configuration from `config.yaml`.
     2. Loads the existing Terraform state from the specified file.
     3. Extracts resources (repositories and teams) from the Terraform state.
-    4. Compares the extracted resources with the new resources provided via environment variables.
+    4. Compares the extracted resources with the new resources provided via environment variables,
+       applying default values from `config.yaml` where applicable.
     5. Calculates the differences (additions, updates, deletions) between the existing and new resources.
     6. Applies the changes by generating, updating, or deleting Terraform files.
 
@@ -40,11 +41,17 @@ def main(output_dir_override=None):
             - `description` (str, optional): A description of the repository.
             - `visibility` (str): The visibility of the repository (e.g., "public" or "private").
             - `gitignore_template` (str, optional): The Git ignore template to apply.
+              If set to "None", this attribute will be excluded from the generated Terraform configuration.
         TEAMS (str): A JSON-encoded list of team definitions. Each team should include:
             - `team_name` (str): The name of the team.
             - `description` (str, optional): A description of the team.
             - `privacy` (str): The privacy level of the team (e.g., "closed" or "secret").
             - `members` (list[dict], optional): A list of team members with their roles.
+
+    Configuration:
+        The application configuration (`config.yaml`) includes:
+        - `default_repository` (dict): Default values for repository attributes, applied if not explicitly provided.
+        - `default_team` (dict): Default values for team attributes, applied if not explicitly provided.
 
     Raises:
         SystemExit: Exits the script with status code 1 if an unhandled error occurs.
@@ -61,6 +68,10 @@ def main(output_dir_override=None):
         - Configuration: `config/config.yaml`
         - Terraform state: `<output_dir>/terraform.tfstate`
         - Resource changes are saved to `<output_dir>/existing_resources.json`.
+
+    Notes:
+        - The `gitignore_template` field in repositories is conditionally included based on its value.
+          If the value is "None", it will be excluded from the generated Terraform configuration.
     """
     try:
         # Load configuration

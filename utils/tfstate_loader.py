@@ -9,11 +9,21 @@ def save_existing_state(state, output_file):
     Save the current state of resources to a file in JSON format.
 
     This function ensures the output directory exists and writes the given state
-    as a JSON file to the specified file path.
+    as a JSON file to the specified file path. The state typically includes details
+    about repositories (e.g., `repository_name`, `description`, `gitignore_template`)
+    and teams.
 
     Args:
-        state (dict): The current state of resources to be saved, typically including
-            lists of repositories and teams.
+        state (dict): The current state of resources to be saved, including:
+            - "repositories" (list[dict]): Each repository dictionary may contain:
+                - `repository_name` (str): The name of the repository.
+                - `description` (str): A description of the repository.
+                - `visibility` (str): The visibility of the repository.
+                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
+            - "teams" (list[dict]): Each team dictionary may contain:
+                - `team_name` (str): The name of the team.
+                - `description` (str): A description of the team.
+                - `privacy` (str): The privacy setting of the team.
         output_file (str): The file path where the state will be saved.
 
     Raises:
@@ -22,8 +32,8 @@ def save_existing_state(state, output_file):
 
     Example:
         state = {
-            "repositories": [{"repository_name": "repo1"}],
-            "teams": [{"team_name": "team1"}]
+            "repositories": [{"repository_name": "repo1", "visibility": "public", "description": "A public repo"}],
+            "teams": [{"team_name": "team1", "description": "A new team", "privacy": "closed"}]
         }
         save_existing_state(state, "output/existing_state.json")
     """
@@ -56,6 +66,7 @@ def load_tfstate(tfstate_file):
 
     Example:
         tfstate = load_tfstate("path/to/terraform.tfstate")
+        # tfstate -> {"resources": [...], ...}
     """
     try:
         with open(tfstate_file, "r") as f:
@@ -75,18 +86,24 @@ def extract_resources(tfstate):
 
     This function processes the Terraform state dictionary and identifies
     resources of type `github_repository` and `github_team`, extracting their
-    relevant attributes.
+    relevant attributes such as `repository_name`, `description`, `gitignore_template`, etc.
 
     Args:
-        tfstate (dict): The Terraform state dictionary, which typically contains
+        tfstate (dict): The Terraform state dictionary, typically containing
             a `resources` key with a list of resource definitions.
 
     Returns:
         dict: A dictionary containing two keys:
-            - "repositories" (list[dict]): A list of repositories with attributes like
-              `repository_name`, `description`, and `visibility`.
-            - "teams" (list[dict]): A list of teams with attributes like `team_name`,
-              `description`, `privacy`, and `members`.
+            - "repositories" (list[dict]): A list of repositories, where each dictionary includes:
+                - `repository_name` (str): The name of the repository.
+                - `description` (str, optional): A description of the repository.
+                - `visibility` (str): The visibility of the repository (e.g., "public", "private").
+                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
+            - "teams" (list[dict]): A list of teams, where each dictionary includes:
+                - `team_name` (str): The name of the team.
+                - `description` (str, optional): A description of the team.
+                - `privacy` (str): The privacy level of the team (e.g., "closed", "secret").
+                - `members` (list[dict], optional): Team members (future support).
 
     Raises:
         KeyError: If expected keys are missing in the Terraform state.
@@ -97,16 +114,19 @@ def extract_resources(tfstate):
             "resources": [
                 {
                     "type": "github_repository",
-                    "instances": [{"attributes": {"name": "repo1", "visibility": "public"}}]
+                    "instances": [{"attributes": {"name": "repo1", "visibility": "public", "description": "Sample repo", "gitignore_template": "Python"}}]
                 },
                 {
                     "type": "github_team",
-                    "instances": [{"attributes": {"name": "team1", "privacy": "closed"}}]
+                    "instances": [{"attributes": {"name": "team1", "privacy": "closed", "description": "Dev team"}}]
                 }
             ]
         }
         resources = extract_resources(tfstate)
-        # resources -> {"repositories": [...], "teams": [...]}
+        # resources -> {
+        #     "repositories": [{"repository_name": "repo1", "description": "Sample repo", "visibility": "public", "gitignore_template": "Python"}],
+        #     "teams": [{"team_name": "team1", "description": "Dev team", "privacy": "closed"}]
+        # }
     """
     try:
         repositories = []

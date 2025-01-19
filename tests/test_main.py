@@ -9,26 +9,31 @@ from main import main
 
 @pytest.fixture
 def mock_config_file(tmpdir):
-    """Create a mock configuration file for testing"""
-    config_content = """
-    template_dir: "templates"
-    output_dir: "terraform"
-    tfstate_file: "terraform.tfstate"
-    state_file: "existing_resources.json"
-    default_repository:
-      visibility: "public"
-    default_team:
-      privacy: "closed"
-      role: "member"
+    """
+    Create a mock configuration file for testing.
+
+    This fixture generates a temporary `config.yaml` file containing default settings
+    for repositories (e.g., `visibility`) and teams (e.g., `privacy`, `role`) to be used
+    during tests.
+
+    Returns:
+        str: The file path to the mock configuration file.
     """
     config_path = tmpdir.join("config.yaml")
-    config_path.write(config_content)
     return str(config_path)
 
 
 @pytest.fixture
 def create_tfstate_file(tmpdir):
-    """Fixture to create a mock Terraform state file."""
+    """
+    Create a mock Terraform state file for testing.
+
+    This fixture generates a temporary `terraform.tfstate` file with sample resources,
+    including one GitHub repository and one GitHub team, to simulate an existing state.
+
+    Returns:
+        str: The file path to the mock Terraform state file.
+    """
     tfstate_path = tmpdir.join("terraform.tfstate")
     tfstate_content = {
         "resources": [
@@ -64,7 +69,17 @@ def create_tfstate_file(tmpdir):
 
 def test_main_repo_addition(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with repository addition.
+    Test the addition of a new repository.
+
+    This test verifies that the `main` function correctly identifies a new repository 
+    (with attributes such as `repository_name`, `description`, and `gitignore_template`) 
+    in the requested state and generates a corresponding Terraform configuration file.
+
+    Steps:
+    1. Mock the `REPOSITORIES` environment variable with a new repository definition.
+    2. Ensure no teams are modified (`TEAMS` is empty).
+    3. Execute the `main` function.
+    4. Verify that the new repository Terraform file is generated.
     """
     repositories = [
         {"repository_name": "new-repo", "description": "New repository",
@@ -88,7 +103,17 @@ def test_main_repo_addition(monkeypatch, tmpdir, create_tfstate_file):
 
 def test_main_repo_update(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with repository update.
+    Test the update of an existing repository.
+
+    This test verifies that the `main` function detects attribute changes (e.g., `description`, 
+    `visibility`) in an existing repository and updates the corresponding Terraform 
+    configuration file.
+
+    Steps:
+    1. Mock the `REPOSITORIES` environment variable with an updated repository definition.
+    2. Ensure no teams are modified (`TEAMS` is empty).
+    3. Execute the `main` function.
+    4. Verify that the repository Terraform file reflects the updated attributes.
     """
     repositories = [
         {"repository_name": "repo1", "description": "Updated repository",
@@ -116,7 +141,17 @@ def test_main_repo_update(monkeypatch, tmpdir, create_tfstate_file):
 
 def test_main_repo_deletion(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with repository deletion.
+    Test the deletion of a repository.
+
+    This test verifies that the `main` function identifies repositories present in the 
+    existing state but not in the requested state and deletes the corresponding 
+    Terraform configuration files.
+
+    Steps:
+    1. Mock the `REPOSITORIES` environment variable with no repositories.
+    2. Ensure no teams are modified (`TEAMS` is empty).
+    3. Execute the `main` function.
+    4. Verify that the repository Terraform file is deleted.
     """
     repositories = []  # No repositories requested
     teams = []  # No changes to teams
@@ -137,7 +172,17 @@ def test_main_repo_deletion(monkeypatch, tmpdir, create_tfstate_file):
 
 def test_main_team_addition(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with team addition.
+    Test the addition of a new team.
+
+    This test verifies that the `main` function correctly identifies a new team 
+    (with attributes such as `team_name`, `description`, and `privacy`) in the requested 
+    state and generates a corresponding Terraform configuration file.
+
+    Steps:
+    1. Mock the `TEAMS` environment variable with a new team definition.
+    2. Ensure no repositories are modified (`REPOSITORIES` is empty).
+    3. Execute the `main` function.
+    4. Verify that the new team Terraform file is generated.
     """
     repositories = []  # No changes to repositories
     teams = [
@@ -161,7 +206,17 @@ def test_main_team_addition(monkeypatch, tmpdir, create_tfstate_file):
 
 def test_main_team_update(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with team update.
+    Test the update of an existing team.
+
+    This test verifies that the `main` function detects attribute changes (e.g., 
+    `description`, `privacy`) in an existing team and updates the corresponding Terraform 
+    configuration file.
+
+    Steps:
+    1. Mock the `TEAMS` environment variable with an updated team definition.
+    2. Ensure no repositories are modified (`REPOSITORIES` is empty).
+    3. Execute the `main` function.
+    4. Verify that the team Terraform file reflects the updated attributes.
     """
     repositories = []  # No changes to repositories
     teams = [
@@ -189,7 +244,17 @@ def test_main_team_update(monkeypatch, tmpdir, create_tfstate_file):
 
 def test_main_team_deletion(monkeypatch, tmpdir, create_tfstate_file):
     """
-    Test the main function with team deletion.
+    Test the deletion of a team.
+
+    This test verifies that the `main` function identifies teams present in the existing 
+    state but not in the requested state and deletes the corresponding Terraform 
+    configuration files.
+
+    Steps:
+    1. Mock the `TEAMS` environment variable with no teams.
+    2. Ensure no repositories are modified (`REPOSITORIES` is empty).
+    3. Execute the `main` function.
+    4. Verify that the team Terraform file is deleted.
     """
     repositories = []  # No changes to repositories
     teams = []  # No teams requested

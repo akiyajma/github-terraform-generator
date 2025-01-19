@@ -10,8 +10,9 @@ def generate_repository(repository, template_dir: str, output_dir: str):
     Generate a Terraform configuration file for a GitHub repository.
 
     This function takes a repository object or dictionary, validates its attributes, and
-    generates a Terraform configuration file using a Jinja2 template. The resulting file
-    is saved to the specified output directory.
+    generates a Terraform configuration file using a Jinja2 template. If the `gitignore_template`
+    attribute is set to "None", it will be excluded from the rendered Terraform file. The
+    resulting file is saved to the specified output directory.
 
     Args:
         repository (Repository or dict): The repository data, either as a `Repository` object
@@ -19,7 +20,8 @@ def generate_repository(repository, template_dir: str, output_dir: str):
             - `repository_name` (str): The name of the repository.
             - `description` (str, optional): A description of the repository.
             - `visibility` (str): The visibility of the repository (e.g., "public" or "private").
-            - `gitignore_template` (str, optional): The Git ignore template to apply.
+            - `gitignore_template` (str, optional): The Git ignore template to apply. If set
+              to "None", this field will not be included in the generated Terraform file.
         template_dir (str): The directory containing the Jinja2 template files.
         output_dir (str): The directory where the generated Terraform file will be saved.
 
@@ -39,6 +41,7 @@ def generate_repository(repository, template_dir: str, output_dir: str):
 
     Notes:
         - The Jinja2 template file must be named `repository.tf.j2` and located in `template_dir`.
+        - If the `gitignore_template` attribute is "None", it is excluded from the Terraform file.
         - The generated file will be saved with the name `<repository_name>_repository.tf` in `output_dir`.
     """
     try:
@@ -86,6 +89,7 @@ def _write_to_file(output_dir: str, filename: str, content: str):
     Notes:
         - The full path of the created file will be `<output_dir>/<filename>`.
         - The function raises an exception if writing to the file fails for any reason.
+        - It ensures that the output directory is created if it does not already exist.
     """
     try:
         os.makedirs(output_dir, exist_ok=True)

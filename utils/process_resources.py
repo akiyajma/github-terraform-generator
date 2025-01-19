@@ -11,7 +11,11 @@ def process_repositories(generator, output_dir, repos_to_add, repos_to_update, r
     Handle the lifecycle of repositories: addition, update, and deletion.
 
     This function generates Terraform files for new or updated repositories and removes
-    Terraform files for deleted repositories.
+    Terraform files for deleted repositories. The generated files are based on the provided
+    repository data, including attributes like `repository_name`, `visibility`, `description`,
+    and `gitignore_template`.
+
+    If `gitignore_template` is set to "None", the attribute is excluded from the generated file.
 
     Args:
         generator (TerraformGenerator): The generator instance used to create Terraform files.
@@ -27,9 +31,15 @@ def process_repositories(generator, output_dir, repos_to_add, repos_to_update, r
         process_repositories(
             generator=TerraformGenerator(template_dir="templates", output_dir="output"),
             output_dir="output",
-            repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
-            repos_to_update=[{"repository_name": "repo2", "visibility": "private"}],
-            repos_to_delete=[{"repository_name": "repo3"}]
+            repos_to_add=[
+                {"repository_name": "repo1", "visibility": "public", "description": "New repo", "gitignore_template": "Python"}
+            ],
+            repos_to_update=[
+                {"repository_name": "repo2", "visibility": "private", "description": "Updated repo", "gitignore_template": "None"}
+            ],
+            repos_to_delete=[
+                {"repository_name": "repo3"}
+            ]
         )
     """
     try:
@@ -73,7 +83,8 @@ def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to
     Handle the lifecycle of teams: addition, update, and deletion.
 
     This function generates Terraform files for new or updated teams and removes
-    Terraform files for deleted teams.
+    Terraform files for deleted teams. Team attributes include `team_name`, `privacy`,
+    `description`, and `members`.
 
     Args:
         generator (TerraformGenerator): The generator instance used to create Terraform files.
@@ -89,9 +100,15 @@ def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to
         process_teams(
             generator=TerraformGenerator(template_dir="templates", output_dir="output"),
             output_dir="output",
-            teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
-            teams_to_update=[{"team_name": "team2", "privacy": "open"}],
-            teams_to_delete=[{"team_name": "team3"}]
+            teams_to_add=[
+                {"team_name": "team1", "privacy": "closed", "description": "New team", "members": [{"username": "user1", "role": "maintainer"}]}
+            ],
+            teams_to_update=[
+                {"team_name": "team2", "privacy": "secret", "description": "Updated team", "members": []}
+            ],
+            teams_to_delete=[
+                {"team_name": "team3"}
+            ]
         )
     """
     try:
@@ -146,10 +163,10 @@ def process_resources(template_dir, output_dir, resource_changes: ResourceChange
 
     Example:
         resource_changes = ResourceChanges(
-            repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
-            repos_to_update=[{"repository_name": "repo2", "visibility": "private"}],
+            repos_to_add=[{"repository_name": "repo1", "visibility": "public", "description": "New repo", "gitignore_template": "Python"}],
+            repos_to_update=[{"repository_name": "repo2", "visibility": "private", "description": "Updated repo", "gitignore_template": "None"}],
             repos_to_delete=[{"repository_name": "repo3"}],
-            teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
+            teams_to_add=[{"team_name": "team1", "privacy": "closed", "description": "New team", "members": [{"username": "user1", "role": "maintainer"}]}],
             teams_to_update=[],
             teams_to_delete=[{"team_name": "team2"}]
         )

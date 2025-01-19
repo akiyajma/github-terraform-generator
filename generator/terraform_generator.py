@@ -18,7 +18,7 @@ class TerraformGenerator:
 
     Example:
         >>> generator = TerraformGenerator(template_dir="templates", output_dir="output")
-        >>> generator.generate_repository({"repository_name": "repo1", "visibility": "public"})
+        >>> generator.generate_repository({"repository_name": "repo1", "visibility": "public", "gitignore_template": "Python"})
         >>> generator.generate_team({"team_name": "team1", "privacy": "closed"})
     """
 
@@ -40,28 +40,55 @@ class TerraformGenerator:
         """
         Generate Terraform configuration files for GitHub repositories.
 
-        If a single repository object is provided, it generates one configuration file.
-        If a list of repositories is provided, it generates files for all repositories in the list.
+        This method generates Terraform configuration files for one or multiple GitHub repositories.
+        Each repository's configuration is rendered using a Jinja2 template and saved to the specified
+        output directory. If `gitignore_template` is explicitly set to `"None"`, it will be excluded
+        from the rendered Terraform configuration.
 
         Args:
-            repository (Repository or dict or list[dict]): A single repository object,
-                dictionary, or a list of dictionaries containing attributes:
-                - `repository_name` (str): The name of the repository.
-                - `visibility` (str): The visibility of the repository (e.g., "public", "private").
-                - `description` (str, optional): A description of the repository.
-                - `gitignore_template` (str, optional): A template for `.gitignore`.
+            repository (Repository or dict or list[dict]): Repository data provided as:
+                - A single `Repository` object.
+                - A dictionary with the following attributes:
+                    - `repository_name` (str): The name of the repository (required).
+                    - `visibility` (str): The repository's visibility (e.g., "public", "private", "internal") (required).
+                    - `description` (str, optional): A brief description of the repository. Defaults to `None` if not specified.
+                    - `gitignore_template` (str, optional): Specifies a `.gitignore` template to apply. If `"None"`, this attribute is excluded.
+                - A list of dictionaries or `Repository` objects.
 
         Raises:
-            ValueError: If the repository data is invalid.
-            Exception: If there is an error during file generation.
+            ValueError: If the repository data is missing required attributes or contains invalid values.
+            Exception: If any error occurs during template rendering or file generation.
 
         Example:
+            Generate a single repository configuration:
             >>> generator = TerraformGenerator("templates", "output")
-            >>> generator.generate_repository({"repository_name": "repo1", "visibility": "public"})
+            >>> generator.generate_repository({
+                "repository_name": "repo1",
+                "visibility": "public",
+                "description": "A public repository",
+                "gitignore_template": "Python"
+            })
+
+            Generate multiple repository configurations:
             >>> generator.generate_repository([
-                {"repository_name": "repo2", "visibility": "private"},
-                {"repository_name": "repo3", "visibility": "public"}
+                {
+                    "repository_name": "repo2",
+                    "visibility": "private",
+                    "description": "A private repository",
+                    "gitignore_template": "Go"
+                },
+                {
+                    "repository_name": "repo3",
+                    "visibility": "public",
+                    "description": "Another public repository",
+                    "gitignore_template": "None"
+                }
             ])
+
+        Notes:
+            - If `description` is not provided, a default value (e.g., from `config.yaml`) will be applied.
+            - If `gitignore_template` is `"None"`, the key is omitted in the generated Terraform file.
+            - The output file for each repository is named `<repository_name>_repository.tf` and saved in the `output_dir`.
         """
         try:
             if isinstance(repository, list):
