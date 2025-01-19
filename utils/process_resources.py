@@ -63,6 +63,7 @@ def process_repositories(generator, output_dir, repos_to_add, repos_to_update, r
             except Exception as e:
                 raise Exception(f"Error deleting repository '{
                                 repo.get('repository_name', 'unknown')}': {e}")
+
     except Exception as e:
         raise Exception(f"Unexpected error processing repositories: {e}")
 
@@ -122,8 +123,9 @@ def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to
                     logger.warning(
                         f"Terraform file not found for deletion: {tf_file}")
             except Exception as e:
-                raise Exception(f"Error deleting team '{
-                                team.get('team_name', 'unknown')}': {e}")
+                logger.error(f"Error deleting team '{
+                             team.get('team_name', 'unknown')}': {e}")
+
     except Exception as e:
         raise Exception(f"Unexpected error processing teams: {e}")
 

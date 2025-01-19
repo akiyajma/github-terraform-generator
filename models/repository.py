@@ -15,3 +15,4 @@ class Repository(BaseModel):
     description: str
     visibility: str = Field(..., pattern="^(public|private|internal)$")
     gitignore_template: str
+    allow_delete: bool = False

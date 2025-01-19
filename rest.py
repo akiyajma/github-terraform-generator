@@ -37,9 +37,10 @@ if not os.path.exists(tfstate_path):
 # 環境変数を設定
 os.environ["REPOSITORIES"] = json.dumps([
     {
-        "repository_name": "repo2",
-        "description": "This is repo2",
-        "visibility": "public"
+        "repository_name": "repo1",
+        "description": "This is repo1",
+        "visibility": "public",
+        "gitignore_template": "Python"
     }
 ])
 

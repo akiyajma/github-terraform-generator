@@ -29,3 +29,4 @@ class Team(BaseModel):
     description: str
     privacy: str = Field(..., pattern="^(closed|secret|open)$")
     members: List[TeamMember]
+    allow_delete: bool = False

@@ -1,0 +1,18 @@
+{
+  "repositories": [
+    {
+      "repository_name": "repo1",
+      "description": "This is repo1",
+      "visibility": "public",
+      "gitignore_template": "Python"
+    }
+  ],
+  "teams": [
+    {
+      "team_name": "team1",
+      "description": "Updated team",
+      "privacy": "closed",
+      "members": []
+    }
+  ]
+}

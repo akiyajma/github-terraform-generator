@@ -119,7 +119,8 @@ def extract_resources(tfstate):
                     repositories.append({
                         "repository_name": attributes["name"],
                         "description": attributes.get("description", ""),
-                        "visibility": attributes["visibility"]
+                        "visibility": attributes["visibility"],
+                        "gitignore_template": attributes.get("gitignore_template", None)
                     })
             elif resource["type"] == "github_team":
                 for instance in resource.get("instances", []):

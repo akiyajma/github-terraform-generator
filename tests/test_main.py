@@ -1,11 +1,10 @@
 import json
 import os
+import re
 
 import pytest
 
-from config.config_loader import load_config
 from main import main
-from utils.tfstate_loader import load_tfstate, save_existing_state
 
 
 @pytest.fixture
@@ -27,57 +26,183 @@ def mock_config_file(tmpdir):
     return str(config_path)
 
 
-def test_main(monkeypatch, tmpdir, mock_config_file):
-    """
-    Test the main function.
+@pytest.fixture
+def create_tfstate_file(tmpdir):
+    """Fixture to create a mock Terraform state file."""
+    tfstate_path = tmpdir.join("terraform.tfstate")
+    tfstate_content = {
+        "resources": [
+            {
+                "type": "github_repository",
+                "instances": [
+                    {
+                        "attributes": {
+                            "name": "repo1",
+                            "visibility": "public",
+                            "gitignore_template": "Python"
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "github_team",
+                "instances": [
+                    {
+                        "attributes": {
+                            "name": "team1",
+                            "description": "Test team",
+                            "privacy": "closed"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    tfstate_path.write(json.dumps(tfstate_content))
+    return str(tfstate_path)
 
-    Test Cases:
-    1. Verify that the tfstate file is correctly loaded.
-    2. Verify that the existing state is correctly saved to a file.
-    3. Verify that the generated Terraform files for repositories and teams are created in the output directory.
+
+def test_main_repo_addition(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with repository addition.
     """
     repositories = [
-        {"repository_name": "test-repo", "description": "Test repository",
-            "visibility": "public", "gitignore_template": "Python"}
+        {"repository_name": "new-repo", "description": "New repository",
+         "visibility": "public", "gitignore_template": "Go"}
     ]
+    teams = []  # No changes to teams
+    monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
+    monkeypatch.setenv("TEAMS", json.dumps(teams))
+
+    tmp_terraform_dir = tmpdir.mkdir("terraform")
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
+
+    # Execute main
+    main(output_dir_override=str(tmp_terraform_dir))
+
+    # Verify addition
+    output_files = os.listdir(str(tmp_terraform_dir))
+    assert "new-repo_repository.tf" in output_files
+
+
+def test_main_repo_update(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with repository update.
+    """
+    repositories = [
+        {"repository_name": "repo1", "description": "Updated repository",
+         "visibility": "private", "gitignore_template": "Python"}
+    ]
+    teams = []  # No changes to teams
+    monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
+    monkeypatch.setenv("TEAMS", json.dumps(teams))
+
+    tmp_terraform_dir = tmpdir.mkdir("terraform")
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
+
+    # Execute main
+    main(output_dir_override=str(tmp_terraform_dir))
+
+    # Verify update
+    output_files = os.listdir(str(tmp_terraform_dir))
+    assert "repo1_repository.tf" in output_files
+    with open(os.path.join(tmp_terraform_dir, "repo1_repository.tf"), "r") as f:
+        content = f.read()
+        assert re.search(r'description\s*=\s*"Updated repository"', content)
+        assert re.search(r'visibility\s*=\s*"private"', content)
+
+
+def test_main_repo_deletion(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with repository deletion.
+    """
+    repositories = []  # No repositories requested
+    teams = []  # No changes to teams
+    monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
+    monkeypatch.setenv("TEAMS", json.dumps(teams))
+
+    tmp_terraform_dir = tmpdir.mkdir("terraform")
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
+
+    # Execute main
+    main(output_dir_override=str(tmp_terraform_dir))
+
+    # Verify deletion
+    output_files = os.listdir(str(tmp_terraform_dir))
+    assert "repo1_repository.tf" not in output_files
+
+
+def test_main_team_addition(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with team addition.
+    """
+    repositories = []  # No changes to repositories
     teams = [
-        {"team_name": "test-team", "description": "Test team", "privacy": "closed",
-            "members": [{"username": "user1", "role": "maintainer"}]}
+        {"team_name": "new-team", "description": "New team", "privacy": "secret",
+         "members": [{"username": "user1", "role": "maintainer"}]}
     ]
     monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
     monkeypatch.setenv("TEAMS", json.dumps(teams))
 
-    # Monkeypatch `load_config` to return the mock configuration file
-    def mock_load_config():
-        return load_config(mock_config_file)
-
-    monkeypatch.setattr("main.load_config", mock_load_config)
-
-    # Create a mock tfstate file
     tmp_terraform_dir = tmpdir.mkdir("terraform")
-    tfstate_file = tmp_terraform_dir.join("terraform.tfstate")
-    existing_tfstate = {
-        "resources": []
-    }
-    tfstate_file.write(json.dumps(existing_tfstate))
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
 
-    # Monkeypatch `load_tfstate`
-    def mock_load_tfstate(file_path):
-        if file_path == os.path.join(str(tmp_terraform_dir), "terraform.tfstate"):
-            return load_tfstate(str(tfstate_file))
-        raise FileNotFoundError(file_path)
-
-    monkeypatch.setattr("main.load_tfstate", mock_load_tfstate)
-
-    # Create a temporary existing state file for testing
-    existing_state_file = tmp_terraform_dir.join("existing_resources.json")
-    existing_state = {"repositories": [], "teams": []}
-    save_existing_state(existing_state, str(existing_state_file))
-
-    # Execute the test target (set the output directory to the temporary directory)
+    # Execute main
     main(output_dir_override=str(tmp_terraform_dir))
 
-    # Verify the results
+    # Verify addition
     output_files = os.listdir(str(tmp_terraform_dir))
-    assert "test-repo_repository.tf" in output_files
-    assert "test-team_team.tf" in output_files
+    assert "new-team_team.tf" in output_files
+
+
+def test_main_team_update(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with team update.
+    """
+    repositories = []  # No changes to repositories
+    teams = [
+        {"team_name": "team1", "description": "Updated team", "privacy": "secret",
+         "members": [{"username": "user1", "role": "maintainer"}]}
+    ]
+    monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
+    monkeypatch.setenv("TEAMS", json.dumps(teams))
+
+    tmp_terraform_dir = tmpdir.mkdir("terraform")
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
+
+    # Execute main
+    main(output_dir_override=str(tmp_terraform_dir))
+
+    # Verify update
+    output_files = os.listdir(str(tmp_terraform_dir))
+    assert "team1_team.tf" in output_files
+    with open(os.path.join(tmp_terraform_dir, "team1_team.tf"), "r") as f:
+        content = f.read()
+        assert re.search(r'description\s*=\s*"Updated team"', content)
+        assert re.search(r'privacy\s*=\s*"secret"', content)
+
+
+def test_main_team_deletion(monkeypatch, tmpdir, create_tfstate_file):
+    """
+    Test the main function with team deletion.
+    """
+    repositories = []  # No changes to repositories
+    teams = []  # No teams requested
+    monkeypatch.setenv("REPOSITORIES", json.dumps(repositories))
+    monkeypatch.setenv("TEAMS", json.dumps(teams))
+
+    tmp_terraform_dir = tmpdir.mkdir("terraform")
+    tfstate_path = os.path.join(tmp_terraform_dir, "terraform.tfstate")
+    os.rename(create_tfstate_file, tfstate_path)
+
+    # Execute main
+    main(output_dir_override=str(tmp_terraform_dir))
+
+    # Verify deletion
+    output_files = os.listdir(str(tmp_terraform_dir))
+    assert "team1_team.tf" not in output_files
