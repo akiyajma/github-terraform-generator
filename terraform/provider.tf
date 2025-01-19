@@ -11,3 +11,9 @@ terraform {
 provider "github" {
   token = var.github_token != "" ? var.github_token : getenv("GITHUB_TOKEN")
 }
+
+variable "github_token" {
+  description = "The GitHub token used for authentication"
+  type        = string
+  default     = ""
+}
