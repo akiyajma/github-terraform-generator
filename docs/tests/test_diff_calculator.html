@@ -57,9 +57,12 @@ el.replaceWith(d);
     Test the calculate_diff function with add, update, and delete cases.
 
     Test Cases:
-    1. Verify that a repository present in &#39;requested&#39; but not in &#39;existing&#39; is added.
-    2. Verify that a repository present in both &#39;existing&#39; and &#39;requested&#39; but with different attributes is updated.
-    3. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is deleted when allow_delete=True.
+    1. Verify that a repository present in &#39;requested&#39; but not in &#39;existing&#39; (e.g., with a new `description`
+       or `gitignore_template`) is correctly identified as to be added.
+    2. Verify that a repository present in both &#39;existing&#39; and &#39;requested&#39; but with different attributes 
+       (e.g., `description`, `visibility`) is correctly identified as to be updated.
+    3. Verify that a repository present in &#39;existing&#39; but marked with `allow_delete=True` in &#39;requested&#39; 
+       is correctly identified as to be deleted.
     &#34;&#34;&#34;
     existing = [
         {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
@@ -94,9 +97,12 @@ el.replaceWith(d);
 </details>
 <div class="desc"><p>Test the calculate_diff function with add, update, and delete cases.</p>
 <p>Test Cases:
-1. Verify that a repository present in 'requested' but not in 'existing' is added.
-2. Verify that a repository present in both 'existing' and 'requested' but with different attributes is updated.
-3. Verify that a repository present in 'existing' but not in 'requested' is deleted when allow_delete=True.</p></div>
+1. Verify that a repository present in 'requested' but not in 'existing' (e.g., with a new <code>description</code>
+or <code>gitignore_template</code>) is correctly identified as to be added.
+2. Verify that a repository present in both 'existing' and 'requested' but with different attributes
+(e.g., <code>description</code>, <code>visibility</code>) is correctly identified as to be updated.
+3. Verify that a repository present in 'existing' but marked with <code>allow_delete=True</code> in 'requested'
+is correctly identified as to be deleted.</p></div>
 </dd>
 <dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_explicit_delete"><code class="name flex">
 <span>def <span class="ident">test_calculate_diff_explicit_delete</span></span>(<span>)</span>
@@ -108,10 +114,11 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def test_calculate_diff_explicit_delete():
     &#34;&#34;&#34;
-    Test the calculate_diff function with explicit delete action.
+    Test the calculate_diff function to verify explicit delete action.
 
     Test Cases:
-    1. Verify that a resource marked with allow_delete=True in &#39;requested&#39; is deleted.
+    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in &#39;requested&#39;, even 
+       if other attributes like `description` or `gitignore_template` remain unchanged.
     &#34;&#34;&#34;
     existing = [
         {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
@@ -130,9 +137,10 @@ el.replaceWith(d);
     assert len(to_delete) == 1
     assert to_delete[0][&#34;repository_name&#34;] == &#34;repo1&#34;</code></pre>
 </details>
-<div class="desc"><p>Test the calculate_diff function with explicit delete action.</p>
+<div class="desc"><p>Test the calculate_diff function to verify explicit delete action.</p>
 <p>Test Cases:
-1. Verify that a resource marked with allow_delete=True in 'requested' is deleted.</p></div>
+1. Verify that a repository is marked for deletion if <code>allow_delete=True</code> is set in 'requested', even
+if other attributes like <code>description</code> or <code>gitignore_template</code> remain unchanged.</p></div>
 </dd>
 <dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_action"><code class="name flex">
 <span>def <span class="ident">test_calculate_diff_no_action</span></span>(<span>)</span>
@@ -147,7 +155,8 @@ el.replaceWith(d);
     Test the calculate_diff function with no action required.
 
     Test Cases:
-    1. Verify that no resources are added, updated, or deleted when the requested state matches the existing state.
+    1. Verify that no repositories are added, updated, or deleted when the requested state matches the 
+       existing state exactly, including attributes like `description` and `gitignore_template`.
     &#34;&#34;&#34;
     existing = [
         {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
@@ -167,7 +176,8 @@ el.replaceWith(d);
 </details>
 <div class="desc"><p>Test the calculate_diff function with no action required.</p>
 <p>Test Cases:
-1. Verify that no resources are added, updated, or deleted when the requested state matches the existing state.</p></div>
+1. Verify that no repositories are added, updated, or deleted when the requested state matches the
+existing state exactly, including attributes like <code>description</code> and <code>gitignore_template</code>.</p></div>
 </dd>
 <dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_delete_without_allow_delete"><code class="name flex">
 <span>def <span class="ident">test_calculate_diff_no_delete_without_allow_delete</span></span>(<span>)</span>
@@ -179,10 +189,12 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def test_calculate_diff_no_delete_without_allow_delete():
     &#34;&#34;&#34;
-    Test the calculate_diff function with no delete action when allow_delete is False or not set.
+    Test the calculate_diff function to ensure no delete action occurs when `allow_delete` is False or not set.
 
     Test Cases:
-    1. Verify that a resource present in &#39;existing&#39; but not in &#39;requested&#39; is not deleted when allow_delete=False or not set.
+    1. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is not marked for deletion 
+       unless `allow_delete=True` is explicitly set in &#39;requested&#39;.
+    2. Ensure attributes like `description` and `gitignore_template` are irrelevant when considering deletion.
     &#34;&#34;&#34;
     existing = [
         {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Existing repo1&#34;,
@@ -202,9 +214,11 @@ el.replaceWith(d);
     assert len(to_update) == 0
     assert len(to_delete) == 0</code></pre>
 </details>
-<div class="desc"><p>Test the calculate_diff function with no delete action when allow_delete is False or not set.</p>
+<div class="desc"><p>Test the calculate_diff function to ensure no delete action occurs when <code>allow_delete</code> is False or not set.</p>
 <p>Test Cases:
-1. Verify that a resource present in 'existing' but not in 'requested' is not deleted when allow_delete=False or not set.</p></div>
+1. Verify that a repository present in 'existing' but not in 'requested' is not marked for deletion
+unless <code>allow_delete=True</code> is explicitly set in 'requested'.
+2. Ensure attributes like <code>description</code> and <code>gitignore_template</code> are irrelevant when considering deletion.</p></div>
 </dd>
 <dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_with_only_updates"><code class="name flex">
 <span>def <span class="ident">test_calculate_diff_with_only_updates</span></span>(<span>)</span>
@@ -216,10 +230,12 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def test_calculate_diff_with_only_updates():
     &#34;&#34;&#34;
-    Test the calculate_diff function with only updates.
+    Test the calculate_diff function to verify updates.
 
     Test Cases:
-    1. Verify that a resource is updated if attributes differ.
+    1. Verify that a repository is marked for update if attributes like `description`, `visibility`, 
+       or `gitignore_template` differ between &#39;existing&#39; and &#39;requested&#39;.
+    2. Ensure no repositories are added or deleted if they exist in both states with different attributes.
     &#34;&#34;&#34;
     existing = [
         {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
@@ -239,9 +255,11 @@ el.replaceWith(d);
     assert to_update[0][&#34;repository_name&#34;] == &#34;repo1&#34;
     assert to_update[0][&#34;description&#34;] == &#34;Updated repo1&#34;</code></pre>
 </details>
-<div class="desc"><p>Test the calculate_diff function with only updates.</p>
+<div class="desc"><p>Test the calculate_diff function to verify updates.</p>
 <p>Test Cases:
-1. Verify that a resource is updated if attributes differ.</p></div>
+1. Verify that a repository is marked for update if attributes like <code>description</code>, <code>visibility</code>,
+or <code>gitignore_template</code> differ between 'existing' and 'requested'.
+2. Ensure no repositories are added or deleted if they exist in both states with different attributes.</p></div>
 </dd>
 </dl>
 </section>

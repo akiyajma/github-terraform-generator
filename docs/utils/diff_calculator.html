@@ -79,20 +79,20 @@ el.replaceWith(d);
 
     Example:
         &gt;&gt;&gt; existing = [
-        ...     {&#34;name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;},
-        ...     {&#34;name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;}
+        ...     {&#34;name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;description&#34;: &#34;First repo&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+        ...     {&#34;name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;, &#34;description&#34;: &#34;Second repo&#34;, &#34;gitignore_template&#34;: &#34;None&#34;}
         ... ]
         &gt;&gt;&gt; requested = [
-        ...     Repository(name=&#34;repo1&#34;, visibility=&#34;private&#34;),
-        ...     Repository(name=&#34;repo3&#34;, visibility=&#34;public&#34;)
+        ...     Repository(name=&#34;repo1&#34;, visibility=&#34;private&#34;, description=&#34;Updated repo&#34;, gitignore_template=&#34;Go&#34;),
+        ...     Repository(name=&#34;repo3&#34;, visibility=&#34;public&#34;, description=&#34;New repo&#34;, gitignore_template=&#34;Java&#34;)
         ... ]
         &gt;&gt;&gt; to_add, to_update, to_delete = calculate_diff(existing, requested, &#34;name&#34;)
         &gt;&gt;&gt; print(to_add)
-        [{&#39;name&#39;: &#39;repo3&#39;, &#39;visibility&#39;: &#39;public&#39;}]
+        [{&#39;name&#39;: &#39;repo3&#39;, &#39;visibility&#39;: &#39;public&#39;, &#39;description&#39;: &#39;New repo&#39;, &#39;gitignore_template&#39;: &#39;Java&#39;}]
         &gt;&gt;&gt; print(to_update)
-        [{&#39;name&#39;: &#39;repo1&#39;, &#39;visibility&#39;: &#39;private&#39;}]
+        [{&#39;name&#39;: &#39;repo1&#39;, &#39;visibility&#39;: &#39;private&#39;, &#39;description&#39;: &#39;Updated repo&#39;, &#39;gitignore_template&#39;: &#39;Go&#39;}]
         &gt;&gt;&gt; print(to_delete)
-        [{&#39;name&#39;: &#39;repo2&#39;, &#39;visibility&#39;: &#39;private&#39;}]
+        [{&#39;name&#39;: &#39;repo2&#39;, &#39;visibility&#39;: &#39;private&#39;, &#39;description&#39;: &#39;Second repo&#39;, &#39;gitignore_template&#39;: &#39;None&#39;}]
 
     Notes:
         - The function converts the `existing` list into a dictionary for efficient lookups.
@@ -101,7 +101,6 @@ el.replaceWith(d);
 
     Logs:
         - Errors encountered during the comparison process, including missing keys or attributes.
-
     &#34;&#34;&#34;
     try:
         # Convert lists to dictionaries using the unique key
@@ -175,20 +174,20 @@ of resources. Each model must include the specified <code>key</code>.</dd>
 </dl>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; existing = [
-...     {&quot;name&quot;: &quot;repo1&quot;, &quot;visibility&quot;: &quot;public&quot;},
-...     {&quot;name&quot;: &quot;repo2&quot;, &quot;visibility&quot;: &quot;private&quot;}
+...     {&quot;name&quot;: &quot;repo1&quot;, &quot;visibility&quot;: &quot;public&quot;, &quot;description&quot;: &quot;First repo&quot;, &quot;gitignore_template&quot;: &quot;Python&quot;},
+...     {&quot;name&quot;: &quot;repo2&quot;, &quot;visibility&quot;: &quot;private&quot;, &quot;description&quot;: &quot;Second repo&quot;, &quot;gitignore_template&quot;: &quot;None&quot;}
 ... ]
 &gt;&gt;&gt; requested = [
-...     Repository(name=&quot;repo1&quot;, visibility=&quot;private&quot;),
-...     Repository(name=&quot;repo3&quot;, visibility=&quot;public&quot;)
+...     Repository(name=&quot;repo1&quot;, visibility=&quot;private&quot;, description=&quot;Updated repo&quot;, gitignore_template=&quot;Go&quot;),
+...     Repository(name=&quot;repo3&quot;, visibility=&quot;public&quot;, description=&quot;New repo&quot;, gitignore_template=&quot;Java&quot;)
 ... ]
 &gt;&gt;&gt; to_add, to_update, to_delete = calculate_diff(existing, requested, &quot;name&quot;)
 &gt;&gt;&gt; print(to_add)
-[{'name': 'repo3', 'visibility': 'public'}]
+[{'name': 'repo3', 'visibility': 'public', 'description': 'New repo', 'gitignore_template': 'Java'}]
 &gt;&gt;&gt; print(to_update)
-[{'name': 'repo1', 'visibility': 'private'}]
+[{'name': 'repo1', 'visibility': 'private', 'description': 'Updated repo', 'gitignore_template': 'Go'}]
 &gt;&gt;&gt; print(to_delete)
-[{'name': 'repo2', 'visibility': 'private'}]
+[{'name': 'repo2', 'visibility': 'private', 'description': 'Second repo', 'gitignore_template': 'None'}]
 </code></pre>
 <h2 id="notes">Notes</h2>
 <ul>

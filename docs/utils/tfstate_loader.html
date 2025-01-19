@@ -58,18 +58,24 @@ el.replaceWith(d);
 
     This function processes the Terraform state dictionary and identifies
     resources of type `github_repository` and `github_team`, extracting their
-    relevant attributes.
+    relevant attributes such as `repository_name`, `description`, `gitignore_template`, etc.
 
     Args:
-        tfstate (dict): The Terraform state dictionary, which typically contains
+        tfstate (dict): The Terraform state dictionary, typically containing
             a `resources` key with a list of resource definitions.
 
     Returns:
         dict: A dictionary containing two keys:
-            - &#34;repositories&#34; (list[dict]): A list of repositories with attributes like
-              `repository_name`, `description`, and `visibility`.
-            - &#34;teams&#34; (list[dict]): A list of teams with attributes like `team_name`,
-              `description`, `privacy`, and `members`.
+            - &#34;repositories&#34; (list[dict]): A list of repositories, where each dictionary includes:
+                - `repository_name` (str): The name of the repository.
+                - `description` (str, optional): A description of the repository.
+                - `visibility` (str): The visibility of the repository (e.g., &#34;public&#34;, &#34;private&#34;).
+                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
+            - &#34;teams&#34; (list[dict]): A list of teams, where each dictionary includes:
+                - `team_name` (str): The name of the team.
+                - `description` (str, optional): A description of the team.
+                - `privacy` (str): The privacy level of the team (e.g., &#34;closed&#34;, &#34;secret&#34;).
+                - `members` (list[dict], optional): Team members (future support).
 
     Raises:
         KeyError: If expected keys are missing in the Terraform state.
@@ -80,16 +86,19 @@ el.replaceWith(d);
             &#34;resources&#34;: [
                 {
                     &#34;type&#34;: &#34;github_repository&#34;,
-                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;}}]
+                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;description&#34;: &#34;Sample repo&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;}}]
                 },
                 {
                     &#34;type&#34;: &#34;github_team&#34;,
-                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;}}]
+                    &#34;instances&#34;: [{&#34;attributes&#34;: {&#34;name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;, &#34;description&#34;: &#34;Dev team&#34;}}]
                 }
             ]
         }
         resources = extract_resources(tfstate)
-        # resources -&gt; {&#34;repositories&#34;: [...], &#34;teams&#34;: [...]}
+        # resources -&gt; {
+        #     &#34;repositories&#34;: [{&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Sample repo&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;}],
+        #     &#34;teams&#34;: [{&#34;team_name&#34;: &#34;team1&#34;, &#34;description&#34;: &#34;Dev team&#34;, &#34;privacy&#34;: &#34;closed&#34;}]
+        # }
     &#34;&#34;&#34;
     try:
         repositories = []
@@ -124,21 +133,27 @@ el.replaceWith(d);
 <div class="desc"><p>Extract lists of repositories and teams from the Terraform state.</p>
 <p>This function processes the Terraform state dictionary and identifies
 resources of type <code>github_repository</code> and <code>github_team</code>, extracting their
-relevant attributes.</p>
+relevant attributes such as <code>repository_name</code>, <code>description</code>, <code>gitignore_template</code>, etc.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>tfstate</code></strong> :&ensp;<code>dict</code></dt>
-<dd>The Terraform state dictionary, which typically contains
+<dd>The Terraform state dictionary, typically containing
 a <code>resources</code> key with a list of resource definitions.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>dict</code></dt>
 <dd>A dictionary containing two keys:
-- "repositories" (list[dict]): A list of repositories with attributes like
-<code>repository_name</code>, <code>description</code>, and <code>visibility</code>.
-- "teams" (list[dict]): A list of teams with attributes like <code>team_name</code>,
-<code>description</code>, <code>privacy</code>, and <code>members</code>.</dd>
+- "repositories" (list[dict]): A list of repositories, where each dictionary includes:
+- <code>repository_name</code> (str): The name of the repository.
+- <code>description</code> (str, optional): A description of the repository.
+- <code>visibility</code> (str): The visibility of the repository (e.g., "public", "private").
+- <code>gitignore_template</code> (str, optional): A <code>.gitignore</code> template, if applicable.
+- "teams" (list[dict]): A list of teams, where each dictionary includes:
+- <code>team_name</code> (str): The name of the team.
+- <code>description</code> (str, optional): A description of the team.
+- <code>privacy</code> (str): The privacy level of the team (e.g., "closed", "secret").
+- <code>members</code> (list[dict], optional): Team members (future support).</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -152,16 +167,19 @@ a <code>resources</code> key with a list of resource definitions.</dd>
 "resources": [
 {
 "type": "github_repository",
-"instances": [{"attributes": {"name": "repo1", "visibility": "public"}}]
+"instances": [{"attributes": {"name": "repo1", "visibility": "public", "description": "Sample repo", "gitignore_template": "Python"}}]
 },
 {
 "type": "github_team",
-"instances": [{"attributes": {"name": "team1", "privacy": "closed"}}]
+"instances": [{"attributes": {"name": "team1", "privacy": "closed", "description": "Dev team"}}]
 }
 ]
 }
 resources = extract_resources(tfstate)</p>
-<h1 _..._="[...]" _repositories_:="&quot;repositories&quot;:" _teams_:="&quot;teams&quot;:" id="resources-">resources -&gt;</h1></div>
+<h1 id="resources-">resources -&gt; {</h1>
+<h1 id="repositories-repository_name-repo1-description-sample-repo-visibility-public-gitignore_template-python">"repositories": [{"repository_name": "repo1", "description": "Sample repo", "visibility": "public", "gitignore_template": "Python"}],</h1>
+<h1 id="teams-team_name-team1-description-dev-team-privacy-closed">"teams": [{"team_name": "team1", "description": "Dev team", "privacy": "closed"}]</h1>
+<h1 id="_1">}</h1></div>
 </dd>
 <dt id="github-terraform-generator.utils.tfstate_loader.load_tfstate"><code class="name flex">
 <span>def <span class="ident">load_tfstate</span></span>(<span>tfstate_file)</span>
@@ -188,6 +206,7 @@ resources = extract_resources(tfstate)</p>
 
     Example:
         tfstate = load_tfstate(&#34;path/to/terraform.tfstate&#34;)
+        # tfstate -&gt; {&#34;resources&#34;: [...], ...}
     &#34;&#34;&#34;
     try:
         with open(tfstate_file, &#34;r&#34;) as f:
@@ -221,7 +240,8 @@ resources = extract_resources(tfstate)</p>
 <dd>For other unexpected errors during file reading or parsing.</dd>
 </dl>
 <h2 id="example">Example</h2>
-<p>tfstate = load_tfstate("path/to/terraform.tfstate")</p></div>
+<p>tfstate = load_tfstate("path/to/terraform.tfstate")</p>
+<h1 _..._="[...]," _resources_:="&quot;resources&quot;:" class=".." id="tfstate-">tfstate -&gt;</h1></div>
 </dd>
 <dt id="github-terraform-generator.utils.tfstate_loader.save_existing_state"><code class="name flex">
 <span>def <span class="ident">save_existing_state</span></span>(<span>state, output_file)</span>
@@ -236,11 +256,21 @@ resources = extract_resources(tfstate)</p>
     Save the current state of resources to a file in JSON format.
 
     This function ensures the output directory exists and writes the given state
-    as a JSON file to the specified file path.
+    as a JSON file to the specified file path. The state typically includes details
+    about repositories (e.g., `repository_name`, `description`, `gitignore_template`)
+    and teams.
 
     Args:
-        state (dict): The current state of resources to be saved, typically including
-            lists of repositories and teams.
+        state (dict): The current state of resources to be saved, including:
+            - &#34;repositories&#34; (list[dict]): Each repository dictionary may contain:
+                - `repository_name` (str): The name of the repository.
+                - `description` (str): A description of the repository.
+                - `visibility` (str): The visibility of the repository.
+                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
+            - &#34;teams&#34; (list[dict]): Each team dictionary may contain:
+                - `team_name` (str): The name of the team.
+                - `description` (str): A description of the team.
+                - `privacy` (str): The privacy setting of the team.
         output_file (str): The file path where the state will be saved.
 
     Raises:
@@ -249,8 +279,8 @@ resources = extract_resources(tfstate)</p>
 
     Example:
         state = {
-            &#34;repositories&#34;: [{&#34;repository_name&#34;: &#34;repo1&#34;}],
-            &#34;teams&#34;: [{&#34;team_name&#34;: &#34;team1&#34;}]
+            &#34;repositories&#34;: [{&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;description&#34;: &#34;A public repo&#34;}],
+            &#34;teams&#34;: [{&#34;team_name&#34;: &#34;team1&#34;, &#34;description&#34;: &#34;A new team&#34;, &#34;privacy&#34;: &#34;closed&#34;}]
         }
         save_existing_state(state, &#34;output/existing_state.json&#34;)
     &#34;&#34;&#34;
@@ -267,12 +297,22 @@ resources = extract_resources(tfstate)</p>
 </details>
 <div class="desc"><p>Save the current state of resources to a file in JSON format.</p>
 <p>This function ensures the output directory exists and writes the given state
-as a JSON file to the specified file path.</p>
+as a JSON file to the specified file path. The state typically includes details
+about repositories (e.g., <code>repository_name</code>, <code>description</code>, <code>gitignore_template</code>)
+and teams.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>state</code></strong> :&ensp;<code>dict</code></dt>
-<dd>The current state of resources to be saved, typically including
-lists of repositories and teams.</dd>
+<dd>The current state of resources to be saved, including:
+- "repositories" (list[dict]): Each repository dictionary may contain:
+- <code>repository_name</code> (str): The name of the repository.
+- <code>description</code> (str): A description of the repository.
+- <code>visibility</code> (str): The visibility of the repository.
+- <code>gitignore_template</code> (str, optional): A <code>.gitignore</code> template, if applicable.
+- "teams" (list[dict]): Each team dictionary may contain:
+- <code>team_name</code> (str): The name of the team.
+- <code>description</code> (str): A description of the team.
+- <code>privacy</code> (str): The privacy setting of the team.</dd>
 <dt><strong><code>output_file</code></strong> :&ensp;<code>str</code></dt>
 <dd>The file path where the state will be saved.</dd>
 </dl>
@@ -285,8 +325,8 @@ lists of repositories and teams.</dd>
 </dl>
 <h2 id="example">Example</h2>
 <p>state = {
-"repositories": [{"repository_name": "repo1"}],
-"teams": [{"team_name": "team1"}]
+"repositories": [{"repository_name": "repo1", "visibility": "public", "description": "A public repo"}],
+"teams": [{"team_name": "team1", "description": "A new team", "privacy": "closed"}]
 }
 save_existing_state(state, "output/existing_state.json")</p></div>
 </dd>

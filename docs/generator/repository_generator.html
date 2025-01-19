@@ -57,8 +57,9 @@ el.replaceWith(d);
     Generate a Terraform configuration file for a GitHub repository.
 
     This function takes a repository object or dictionary, validates its attributes, and
-    generates a Terraform configuration file using a Jinja2 template. The resulting file
-    is saved to the specified output directory.
+    generates a Terraform configuration file using a Jinja2 template. If the `gitignore_template`
+    attribute is set to &#34;None&#34;, it will be excluded from the rendered Terraform file. The
+    resulting file is saved to the specified output directory.
 
     Args:
         repository (Repository or dict): The repository data, either as a `Repository` object
@@ -66,7 +67,8 @@ el.replaceWith(d);
             - `repository_name` (str): The name of the repository.
             - `description` (str, optional): A description of the repository.
             - `visibility` (str): The visibility of the repository (e.g., &#34;public&#34; or &#34;private&#34;).
-            - `gitignore_template` (str, optional): The Git ignore template to apply.
+            - `gitignore_template` (str, optional): The Git ignore template to apply. If set
+              to &#34;None&#34;, this field will not be included in the generated Terraform file.
         template_dir (str): The directory containing the Jinja2 template files.
         output_dir (str): The directory where the generated Terraform file will be saved.
 
@@ -86,6 +88,7 @@ el.replaceWith(d);
 
     Notes:
         - The Jinja2 template file must be named `repository.tf.j2` and located in `template_dir`.
+        - If the `gitignore_template` attribute is &#34;None&#34;, it is excluded from the Terraform file.
         - The generated file will be saved with the name `&lt;repository_name&gt;_repository.tf` in `output_dir`.
     &#34;&#34;&#34;
     try:
@@ -110,8 +113,9 @@ el.replaceWith(d);
 </details>
 <div class="desc"><p>Generate a Terraform configuration file for a GitHub repository.</p>
 <p>This function takes a repository object or dictionary, validates its attributes, and
-generates a Terraform configuration file using a Jinja2 template. The resulting file
-is saved to the specified output directory.</p>
+generates a Terraform configuration file using a Jinja2 template. If the <code>gitignore_template</code>
+attribute is set to "None", it will be excluded from the rendered Terraform file. The
+resulting file is saved to the specified output directory.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>repository</code></strong> :&ensp;<code>Repository</code> or <code>dict</code></dt>
@@ -120,7 +124,8 @@ or a dictionary with the following keys:
 - <code>repository_name</code> (str): The name of the repository.
 - <code>description</code> (str, optional): A description of the repository.
 - <code>visibility</code> (str): The visibility of the repository (e.g., "public" or "private").
-- <code>gitignore_template</code> (str, optional): The Git ignore template to apply.</dd>
+- <code>gitignore_template</code> (str, optional): The Git ignore template to apply. If set
+to "None", this field will not be included in the generated Terraform file.</dd>
 <dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
 <dd>The directory containing the Jinja2 template files.</dd>
 <dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
@@ -147,6 +152,7 @@ or a dictionary with the following keys:
 <h2 id="notes">Notes</h2>
 <ul>
 <li>The Jinja2 template file must be named <code>repository.tf.j2</code> and located in <code>template_dir</code>.</li>
+<li>If the <code>gitignore_template</code> attribute is "None", it is excluded from the Terraform file.</li>
 <li>The generated file will be saved with the name <code>&lt;repository_name&gt;_repository.tf</code> in <code>output_dir</code>.</li>
 </ul></div>
 </dd>
