@@ -59,9 +59,9 @@ el.replaceWith(d);
     Test Cases:
     1. Verify that a repository present in &#39;requested&#39; but not in &#39;existing&#39; (e.g., with a new `description`
        or `gitignore_template`) is correctly identified as to be added.
-    2. Verify that a repository present in both &#39;existing&#39; and &#39;requested&#39; but with different attributes 
+    2. Verify that a repository present in both &#39;existing&#39; and &#39;requested&#39; but with different attributes
        (e.g., `description`, `visibility`) is correctly identified as to be updated.
-    3. Verify that a repository present in &#39;existing&#39; but marked with `allow_delete=True` in &#39;requested&#39; 
+    3. Verify that a repository present in &#39;existing&#39; but marked with `allow_delete=True` in &#39;requested&#39;
        is correctly identified as to be deleted.
     &#34;&#34;&#34;
     existing = [
@@ -117,7 +117,7 @@ is correctly identified as to be deleted.</p></div>
     Test the calculate_diff function to verify explicit delete action.
 
     Test Cases:
-    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in &#39;requested&#39;, even 
+    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in &#39;requested&#39;, even
        if other attributes like `description` or `gitignore_template` remain unchanged.
     &#34;&#34;&#34;
     existing = [
@@ -155,7 +155,7 @@ if other attributes like <code>description</code> or <code>gitignore_template</c
     Test the calculate_diff function with no action required.
 
     Test Cases:
-    1. Verify that no repositories are added, updated, or deleted when the requested state matches the 
+    1. Verify that no repositories are added, updated, or deleted when the requested state matches the
        existing state exactly, including attributes like `description` and `gitignore_template`.
     &#34;&#34;&#34;
     existing = [
@@ -192,7 +192,7 @@ existing state exactly, including attributes like <code>description</code> and <
     Test the calculate_diff function to ensure no delete action occurs when `allow_delete` is False or not set.
 
     Test Cases:
-    1. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is not marked for deletion 
+    1. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is not marked for deletion
        unless `allow_delete=True` is explicitly set in &#39;requested&#39;.
     2. Ensure attributes like `description` and `gitignore_template` are irrelevant when considering deletion.
     &#34;&#34;&#34;
@@ -233,7 +233,7 @@ unless <code>allow_delete=True</code> is explicitly set in 'requested'.
     Test the calculate_diff function to verify updates.
 
     Test Cases:
-    1. Verify that a repository is marked for update if attributes like `description`, `visibility`, 
+    1. Verify that a repository is marked for update if attributes like `description`, `visibility`,
        or `gitignore_template` differ between &#39;existing&#39; and &#39;requested&#39;.
     2. Ensure no repositories are added or deleted if they exist in both states with different attributes.
     &#34;&#34;&#34;
