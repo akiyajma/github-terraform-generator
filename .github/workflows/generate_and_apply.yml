@@ -1,0 +1,63 @@
+name: Terraform Resource Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      repositories:
+        description: 'JSON-encoded list of repositories (e.g., [{"repository_name": "repo1", ...}])'
+        required: false
+        default: '[]'
+      teams:
+        description: 'JSON-encoded list of teams (e.g., [{"team_name": "team1", ...}])'
+        required: false
+        default: '[]'
+
+jobs:
+  manage-resources:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: '1.11.0'
+
+      - name: Set environment variables
+        run: |
+          echo "REPOSITORIES=${{ inputs.repositories }}" >> $GITHUB_ENV
+          echo "TEAMS=${{ inputs.teams }}" >> $GITHUB_ENV
+
+      - name: Install pip-tools and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip-sync requirements.txt
+
+      - name: Run resource management script
+        run: |
+          python main.py
+        env:
+          REPOSITORIES: ${{ env.REPOSITORIES }}
+          TEAMS: ${{ env.TEAMS }}
+
+      - name: Terraform Init
+        if: success()
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        if: success()
+        run: terraform plan -out=tfplan
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        if: success()
+        run: terraform apply -auto-approve tfplan
+        working-directory: ./terraform

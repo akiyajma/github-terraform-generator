@@ -81,9 +81,13 @@ def main(output_dir_override=None):
         # Load new resources
         repositories_json = os.getenv("REPOSITORIES", "[]")
         teams_json = os.getenv("TEAMS", "[]")
-        new_repositories = [Repository(**repo)
-                            for repo in json.loads(repositories_json)]
-        new_teams = [Team(**team) for team in json.loads(teams_json)]
+        new_repositories = []
+        if repositories_json.strip():
+            new_repositories = [Repository(**repo)
+                                for repo in json.loads(repositories_json)]
+        new_teams = []
+        if teams_json.strip():
+            new_teams = [Team(**team) for team in json.loads(teams_json)]
 
         # Calculate differences
         repos_to_add, repos_to_update, repos_to_delete = calculate_diff(
