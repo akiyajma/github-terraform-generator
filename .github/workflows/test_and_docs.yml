@@ -1,4 +1,4 @@
-name: CI/CD for Pytest and Pdoc with Pip-tools
+name: Test and Generate Documentation
 
 on:
   push:
