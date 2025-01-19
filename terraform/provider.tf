@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "github" {
-  token = var.github_token != "" ? var.github_token : getenv("GITHUB_TOKEN")
+  token = var.github_token
 }
 
 variable "github_token" {
