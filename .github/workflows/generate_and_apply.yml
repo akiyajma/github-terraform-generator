@@ -29,7 +29,7 @@ on:
           []
 
 jobs:
-  manage-resources:
+  generate-and-apply:
     runs-on: ubuntu-latest
 
     steps:
