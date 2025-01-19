@@ -9,9 +9,9 @@ def test_calculate_diff_add_update_delete():
     Test Cases:
     1. Verify that a repository present in 'requested' but not in 'existing' (e.g., with a new `description`
        or `gitignore_template`) is correctly identified as to be added.
-    2. Verify that a repository present in both 'existing' and 'requested' but with different attributes 
+    2. Verify that a repository present in both 'existing' and 'requested' but with different attributes
        (e.g., `description`, `visibility`) is correctly identified as to be updated.
-    3. Verify that a repository present in 'existing' but marked with `allow_delete=True` in 'requested' 
+    3. Verify that a repository present in 'existing' but marked with `allow_delete=True` in 'requested'
        is correctly identified as to be deleted.
     """
     existing = [
@@ -51,7 +51,7 @@ def test_calculate_diff_no_action():
     Test the calculate_diff function with no action required.
 
     Test Cases:
-    1. Verify that no repositories are added, updated, or deleted when the requested state matches the 
+    1. Verify that no repositories are added, updated, or deleted when the requested state matches the
        existing state exactly, including attributes like `description` and `gitignore_template`.
     """
     existing = [
@@ -76,7 +76,7 @@ def test_calculate_diff_no_delete_without_allow_delete():
     Test the calculate_diff function to ensure no delete action occurs when `allow_delete` is False or not set.
 
     Test Cases:
-    1. Verify that a repository present in 'existing' but not in 'requested' is not marked for deletion 
+    1. Verify that a repository present in 'existing' but not in 'requested' is not marked for deletion
        unless `allow_delete=True` is explicitly set in 'requested'.
     2. Ensure attributes like `description` and `gitignore_template` are irrelevant when considering deletion.
     """
@@ -104,7 +104,7 @@ def test_calculate_diff_with_only_updates():
     Test the calculate_diff function to verify updates.
 
     Test Cases:
-    1. Verify that a repository is marked for update if attributes like `description`, `visibility`, 
+    1. Verify that a repository is marked for update if attributes like `description`, `visibility`,
        or `gitignore_template` differ between 'existing' and 'requested'.
     2. Ensure no repositories are added or deleted if they exist in both states with different attributes.
     """
@@ -132,7 +132,7 @@ def test_calculate_diff_explicit_delete():
     Test the calculate_diff function to verify explicit delete action.
 
     Test Cases:
-    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in 'requested', even 
+    1. Verify that a repository is marked for deletion if `allow_delete=True` is set in 'requested', even
        if other attributes like `description` or `gitignore_template` remain unchanged.
     """
     existing = [

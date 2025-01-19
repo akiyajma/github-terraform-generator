@@ -11,6 +11,7 @@ This project provides a tool to generate Terraform files for provisioning GitHub
 - [Configuration](#configuration)
 - [Logging](#logging)
 - [Testing](#testing)
+- [GitHub Actions](#github-actions)
 - [Project Structure](#project-structure)
 - [Documentation](#documentation)
 
@@ -119,6 +120,53 @@ pytest tests/
 ```
 The tests cover various aspects of the project, including model validation, resource generation, and difference calculation.
 
+## GitHub Actions
+This project includes two GitHub Actions workflows to automate testing, documentation generation, and Terraform code application.
+
+### Workflows
+This workflow generates Terraform configuration files and applies them to GitHub. It can be triggered manually using the `workflow_dispatch` event.
+
+**Workflow File:** `generate_and_apply.yml`
+
+**Inputs:**
+- `repositories`: JSON-encoded list of repositories with attributes like `repository_name`, `description`, `visibility`, and `gitignore_template`.
+- `teams`: JSON-encoded list of teams with attributes like `team_name`, `description`, `privacy`, and `members`.
+
+**How to Trigger:** Use the GitHub UI or API to start the workflow with appropriate inputs.
+
+**Environment Variables:**
+- `GIST_GITHUB_TOKEN`: Required for Terraform to authenticate with GitHub.
+
+### Test and Generate Documentation
+
+This workflow runs tests using `pytest` and generates Markdown-based documentation using `pdoc`. It is triggered on every push to any branch.
+
+**Workflow File:** `test_and_docs.yml`
+
+**Key Steps:**
+- Runs all tests in the `tests/` directory.
+- Generates documentation and commits changes to the `docs/` directory for the `main` branch.
+
+### Trigger Workflows via API
+You can trigger the workflows using the GitHub REST API. Below is an example of triggering the Generate Terraform Code and Apply workflow:
+
+**API Endpoint**
+```
+POST /repos/{owner}/{repo}/actions/workflows/generate_and_apply.yml/dispatches
+Host: api.github.com
+Authorization: Bearer <YOUR_PERSONAL_ACCESS_TOKEN>
+Content-Type: application/json
+```
+**Request Body**
+```json
+{
+  "ref": "main",
+  "inputs": {
+    "repositories": "[{\"repository_name\": \"repo1\", \"description\": \"This is repo1\", \"visibility\": \"public\", \"gitignore_template\": \"Python\"}]"
+  }
+}
+```
+
 ## Project Structure
 ```
 terraform-generator/
@@ -127,17 +175,7 @@ terraform-generator/
 │   ├── config_loader.py
 │   └── config.yaml
 ├── docs/
-│   ├── generator/
-│   │   ├── index.md
-│   │   ├── repository_generator.md
-│   │   └── team_generator.md
-│   ├── main.md
-│   └── utils/
-│       ├── diff_calculator.md
-│       ├── index.md
-│       ├── process_resources.md
-│       ├── resource_changes.md
-│       └── tfstate_loader.md
+│   └── ....
 ├── generator/
 │   ├── __init__.py
 │   ├── repository_generator.py
@@ -182,5 +220,5 @@ Documentation is generated and available in the docs/ directory. It includes det
 
 To generate the documentation in Markdown format, run the following command:
 ```python
-python -m pdoc --html --output-dir temp-docs --force .  
+pdoc --html --output-dir temp-docs --force .  
 ```

@@ -2,9 +2,9 @@ class ResourceChanges:
     """
     Represents the changes to be applied to resources (repositories and teams).
 
-    This class encapsulates lists of repositories and teams to add, update, or delete, 
+    This class encapsulates lists of repositories and teams to add, update, or delete,
     providing a structured way to manage changes during Terraform configuration generation.
-    It includes attributes like `gitignore_template` and `description` for repositories 
+    It includes attributes like `gitignore_template` and `description` for repositories
     and `description` for teams to ensure detailed resource definitions.
 
     Attributes:
