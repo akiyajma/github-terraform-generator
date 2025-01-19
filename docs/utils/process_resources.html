@@ -109,6 +109,7 @@ el.replaceWith(d);
             except Exception as e:
                 raise Exception(f&#34;Error deleting repository &#39;{
                                 repo.get(&#39;repository_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
     except Exception as e:
         raise Exception(f&#34;Unexpected error processing repositories: {e}&#34;)</code></pre>
 </details>
@@ -290,8 +291,9 @@ process_resources(template_dir="templates", output_dir="output", resource_change
                     logger.warning(
                         f&#34;Terraform file not found for deletion: {tf_file}&#34;)
             except Exception as e:
-                raise Exception(f&#34;Error deleting team &#39;{
-                                team.get(&#39;team_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+                logger.error(f&#34;Error deleting team &#39;{
+                             team.get(&#39;team_name&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+
     except Exception as e:
         raise Exception(f&#34;Unexpected error processing teams: {e}&#34;)</code></pre>
 </details>

@@ -109,16 +109,28 @@ el.replaceWith(d);
         requested_dict = {getattr(item, key): item.model_dump()
                           for item in requested}
 
-        # Determine additions, updates, and deletions
+        def normalize_dict(resource):
+            # Remove keys that should not affect comparison
+            ignored_keys = {&#34;allow_delete&#34;}
+            return {k: v for k, v in resource.items() if k not in ignored_keys}
+
+        # Determine additions
         to_add = [requested_dict[name]
                   for name in requested_dict if name not in existing_dict]
+
+        # Determine updates
         to_update = [
             requested_dict[name]
             for name in requested_dict
-            if name in existing_dict and existing_dict[name] != requested_dict[name]
+            if name in existing_dict and normalize_dict(existing_dict[name]) != normalize_dict(requested_dict[name])
         ]
-        to_delete = [existing_dict[name]
-                     for name in existing_dict if name not in requested_dict]
+
+        # Determine deletions
+        to_delete = [
+            existing_dict[name]
+            for name in existing_dict
+            if name in requested_dict and requested_dict[name].get(&#34;allow_delete&#34;, False)
+        ]
 
         return to_add, to_update, to_delete
     except KeyError as e:

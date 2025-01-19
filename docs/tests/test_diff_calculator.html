@@ -44,53 +44,204 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff"><code class="name flex">
-<span>def <span class="ident">test_calculate_diff</span></span>(<span>)</span>
+<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_add_update_delete"><code class="name flex">
+<span>def <span class="ident">test_calculate_diff_add_update_delete</span></span>(<span>)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def test_calculate_diff():
+<pre><code class="python">def test_calculate_diff_add_update_delete():
     &#34;&#34;&#34;
-    Test the calculate_diff function.
+    Test the calculate_diff function with add, update, and delete cases.
 
     Test Cases:
     1. Verify that a repository present in &#39;requested&#39; but not in &#39;existing&#39; is added.
     2. Verify that a repository present in both &#39;existing&#39; and &#39;requested&#39; but with different attributes is updated.
-    3. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is deleted.
+    3. Verify that a repository present in &#39;existing&#39; but not in &#39;requested&#39; is deleted when allow_delete=True.
     &#34;&#34;&#34;
     existing = [
-        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;,
-            &#34;gitignore_template&#34;: &#34;Python&#34;},
-        {&#34;repository_name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;,
-            &#34;gitignore_template&#34;: &#34;Node&#34;}
+        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
+         &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+        {&#34;repository_name&#34;: &#34;repo2&#34;, &#34;description&#34;: &#34;Old repo2&#34;,
+         &#34;visibility&#34;: &#34;private&#34;, &#34;gitignore_template&#34;: &#34;Node&#34;},
     ]
     requested = [
-        Repository(repository_name=&#34;repo1&#34;, description=&#34;&#34;,
+        Repository(repository_name=&#34;repo1&#34;, description=&#34;New repo1&#34;,
                    visibility=&#34;private&#34;, gitignore_template=&#34;Python&#34;),
-        Repository(repository_name=&#34;repo3&#34;, description=&#34;&#34;,
-                   visibility=&#34;public&#34;, gitignore_template=&#34;Go&#34;)
+        Repository(repository_name=&#34;repo3&#34;, description=&#34;New repo3&#34;,
+                   visibility=&#34;public&#34;, gitignore_template=&#34;Go&#34;),
+        Repository(repository_name=&#34;repo2&#34;, description=&#34;Old repo2&#34;,
+                   visibility=&#34;private&#34;, gitignore_template=&#34;Node&#34;, allow_delete=True),
     ]
 
     to_add, to_update, to_delete = calculate_diff(
         existing, requested, &#34;repository_name&#34;)
 
+    # Add
     assert len(to_add) == 1
     assert to_add[0][&#34;repository_name&#34;] == &#34;repo3&#34;
 
+    # Update
     assert len(to_update) == 1
     assert to_update[0][&#34;repository_name&#34;] == &#34;repo1&#34;
+    assert to_update[0][&#34;description&#34;] == &#34;New repo1&#34;
 
+    # Delete
     assert len(to_delete) == 1
     assert to_delete[0][&#34;repository_name&#34;] == &#34;repo2&#34;</code></pre>
 </details>
-<div class="desc"><p>Test the calculate_diff function.</p>
+<div class="desc"><p>Test the calculate_diff function with add, update, and delete cases.</p>
 <p>Test Cases:
 1. Verify that a repository present in 'requested' but not in 'existing' is added.
 2. Verify that a repository present in both 'existing' and 'requested' but with different attributes is updated.
-3. Verify that a repository present in 'existing' but not in 'requested' is deleted.</p></div>
+3. Verify that a repository present in 'existing' but not in 'requested' is deleted when allow_delete=True.</p></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_explicit_delete"><code class="name flex">
+<span>def <span class="ident">test_calculate_diff_explicit_delete</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_calculate_diff_explicit_delete():
+    &#34;&#34;&#34;
+    Test the calculate_diff function with explicit delete action.
+
+    Test Cases:
+    1. Verify that a resource marked with allow_delete=True in &#39;requested&#39; is deleted.
+    &#34;&#34;&#34;
+    existing = [
+        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
+         &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+    ]
+    requested = [
+        Repository(repository_name=&#34;repo1&#34;, description=&#34;Old repo1&#34;,
+                   visibility=&#34;public&#34;, gitignore_template=&#34;Python&#34;, allow_delete=True),
+    ]
+
+    to_add, to_update, to_delete = calculate_diff(
+        existing, requested, &#34;repository_name&#34;)
+
+    assert len(to_add) == 0
+    assert len(to_update) == 0
+    assert len(to_delete) == 1
+    assert to_delete[0][&#34;repository_name&#34;] == &#34;repo1&#34;</code></pre>
+</details>
+<div class="desc"><p>Test the calculate_diff function with explicit delete action.</p>
+<p>Test Cases:
+1. Verify that a resource marked with allow_delete=True in 'requested' is deleted.</p></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_action"><code class="name flex">
+<span>def <span class="ident">test_calculate_diff_no_action</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_calculate_diff_no_action():
+    &#34;&#34;&#34;
+    Test the calculate_diff function with no action required.
+
+    Test Cases:
+    1. Verify that no resources are added, updated, or deleted when the requested state matches the existing state.
+    &#34;&#34;&#34;
+    existing = [
+        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
+         &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+    ]
+    requested = [
+        Repository(repository_name=&#34;repo1&#34;, description=&#34;Old repo1&#34;,
+                   visibility=&#34;public&#34;, gitignore_template=&#34;Python&#34;),
+    ]
+
+    to_add, to_update, to_delete = calculate_diff(
+        existing, requested, &#34;repository_name&#34;)
+
+    assert len(to_add) == 0
+    assert len(to_update) == 0
+    assert len(to_delete) == 0</code></pre>
+</details>
+<div class="desc"><p>Test the calculate_diff function with no action required.</p>
+<p>Test Cases:
+1. Verify that no resources are added, updated, or deleted when the requested state matches the existing state.</p></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_delete_without_allow_delete"><code class="name flex">
+<span>def <span class="ident">test_calculate_diff_no_delete_without_allow_delete</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_calculate_diff_no_delete_without_allow_delete():
+    &#34;&#34;&#34;
+    Test the calculate_diff function with no delete action when allow_delete is False or not set.
+
+    Test Cases:
+    1. Verify that a resource present in &#39;existing&#39; but not in &#39;requested&#39; is not deleted when allow_delete=False or not set.
+    &#34;&#34;&#34;
+    existing = [
+        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Existing repo1&#34;,
+         &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+        {&#34;repository_name&#34;: &#34;repo2&#34;, &#34;description&#34;: &#34;Existing repo2&#34;,
+         &#34;visibility&#34;: &#34;private&#34;, &#34;gitignore_template&#34;: &#34;Node&#34;},
+    ]
+    requested = [
+        Repository(repository_name=&#34;repo1&#34;, description=&#34;Existing repo1&#34;,
+                   visibility=&#34;public&#34;, gitignore_template=&#34;Python&#34;),
+    ]
+
+    to_add, to_update, to_delete = calculate_diff(
+        existing, requested, &#34;repository_name&#34;)
+
+    assert len(to_add) == 0
+    assert len(to_update) == 0
+    assert len(to_delete) == 0</code></pre>
+</details>
+<div class="desc"><p>Test the calculate_diff function with no delete action when allow_delete is False or not set.</p>
+<p>Test Cases:
+1. Verify that a resource present in 'existing' but not in 'requested' is not deleted when allow_delete=False or not set.</p></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_with_only_updates"><code class="name flex">
+<span>def <span class="ident">test_calculate_diff_with_only_updates</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_calculate_diff_with_only_updates():
+    &#34;&#34;&#34;
+    Test the calculate_diff function with only updates.
+
+    Test Cases:
+    1. Verify that a resource is updated if attributes differ.
+    &#34;&#34;&#34;
+    existing = [
+        {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;description&#34;: &#34;Old repo1&#34;,
+         &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;},
+    ]
+    requested = [
+        Repository(repository_name=&#34;repo1&#34;, description=&#34;Updated repo1&#34;,
+                   visibility=&#34;private&#34;, gitignore_template=&#34;Python&#34;),
+    ]
+
+    to_add, to_update, to_delete = calculate_diff(
+        existing, requested, &#34;repository_name&#34;)
+
+    assert len(to_add) == 0
+    assert len(to_update) == 1
+    assert len(to_delete) == 0
+    assert to_update[0][&#34;repository_name&#34;] == &#34;repo1&#34;
+    assert to_update[0][&#34;description&#34;] == &#34;Updated repo1&#34;</code></pre>
+</details>
+<div class="desc"><p>Test the calculate_diff function with only updates.</p>
+<p>Test Cases:
+1. Verify that a resource is updated if attributes differ.</p></div>
 </dd>
 </dl>
 </section>
@@ -109,7 +260,11 @@ el.replaceWith(d);
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff">test_calculate_diff</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_add_update_delete" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_add_update_delete">test_calculate_diff_add_update_delete</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_explicit_delete" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_explicit_delete">test_calculate_diff_explicit_delete</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_action" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_action">test_calculate_diff_no_action</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_delete_without_allow_delete" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_no_delete_without_allow_delete">test_calculate_diff_no_delete_without_allow_delete</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_with_only_updates" href="#github-terraform-generator.tests.test_diff_calculator.test_calculate_diff_with_only_updates">test_calculate_diff_with_only_updates</a></code></li>
 </ul>
 </li>
 </ul>

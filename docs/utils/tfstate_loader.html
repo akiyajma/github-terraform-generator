@@ -102,7 +102,8 @@ el.replaceWith(d);
                     repositories.append({
                         &#34;repository_name&#34;: attributes[&#34;name&#34;],
                         &#34;description&#34;: attributes.get(&#34;description&#34;, &#34;&#34;),
-                        &#34;visibility&#34;: attributes[&#34;visibility&#34;]
+                        &#34;visibility&#34;: attributes[&#34;visibility&#34;],
+                        &#34;gitignore_template&#34;: attributes.get(&#34;gitignore_template&#34;, None)
                     })
             elif resource[&#34;type&#34;] == &#34;github_team&#34;:
                 for instance in resource.get(&#34;instances&#34;, []):

@@ -79,7 +79,8 @@ el.replaceWith(d);
     repository_name: str
     description: str
     visibility: str = Field(..., pattern=&#34;^(public|private|internal)$&#34;)
-    gitignore_template: str</code></pre>
+    gitignore_template: str
+    allow_delete: bool = False</code></pre>
 </details>
 <div class="desc"><p>A model representing a repository.</p>
 <h2 id="attributes">Attributes</h2>
@@ -103,6 +104,10 @@ validated to form a valid model.</p>
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="github-terraform-generator.models.Repository.allow_delete"><code class="name">var <span class="ident">allow_delete</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="github-terraform-generator.models.Repository.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
@@ -147,7 +152,8 @@ validated to form a valid model.</p>
     team_name: str
     description: str
     privacy: str = Field(..., pattern=&#34;^(closed|secret|open)$&#34;)
-    members: List[TeamMember]</code></pre>
+    members: List[TeamMember]
+    allow_delete: bool = False</code></pre>
 </details>
 <div class="desc"><p>A model representing a team.</p>
 <h2 id="attributes">Attributes</h2>
@@ -171,6 +177,10 @@ validated to form a valid model.</p>
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="github-terraform-generator.models.Team.allow_delete"><code class="name">var <span class="ident">allow_delete</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="github-terraform-generator.models.Team.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
@@ -268,7 +278,8 @@ validated to form a valid model.</p>
 <ul>
 <li>
 <h4><code><a title="github-terraform-generator.models.Repository" href="#github-terraform-generator.models.Repository">Repository</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="github-terraform-generator.models.Repository.allow_delete" href="#github-terraform-generator.models.Repository.allow_delete">allow_delete</a></code></li>
 <li><code><a title="github-terraform-generator.models.Repository.description" href="#github-terraform-generator.models.Repository.description">description</a></code></li>
 <li><code><a title="github-terraform-generator.models.Repository.gitignore_template" href="#github-terraform-generator.models.Repository.gitignore_template">gitignore_template</a></code></li>
 <li><code><a title="github-terraform-generator.models.Repository.model_config" href="#github-terraform-generator.models.Repository.model_config">model_config</a></code></li>
@@ -278,7 +289,8 @@ validated to form a valid model.</p>
 </li>
 <li>
 <h4><code><a title="github-terraform-generator.models.Team" href="#github-terraform-generator.models.Team">Team</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="github-terraform-generator.models.Team.allow_delete" href="#github-terraform-generator.models.Team.allow_delete">allow_delete</a></code></li>
 <li><code><a title="github-terraform-generator.models.Team.description" href="#github-terraform-generator.models.Team.description">description</a></code></li>
 <li><code><a title="github-terraform-generator.models.Team.members" href="#github-terraform-generator.models.Team.members">members</a></code></li>
 <li><code><a title="github-terraform-generator.models.Team.model_config" href="#github-terraform-generator.models.Team.model_config">model_config</a></code></li>
