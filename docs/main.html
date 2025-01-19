@@ -116,9 +116,13 @@ el.replaceWith(d);
         # Load new resources
         repositories_json = os.getenv(&#34;REPOSITORIES&#34;, &#34;[]&#34;)
         teams_json = os.getenv(&#34;TEAMS&#34;, &#34;[]&#34;)
-        new_repositories = [Repository(**repo)
-                            for repo in json.loads(repositories_json)]
-        new_teams = [Team(**team) for team in json.loads(teams_json)]
+        new_repositories = []
+        if repositories_json.strip():
+            new_repositories = [Repository(**repo)
+                                for repo in json.loads(repositories_json)]
+        new_teams = []
+        if teams_json.strip():
+            new_teams = [Team(**team) for team in json.loads(teams_json)]
 
         # Calculate differences
         repos_to_add, repos_to_update, repos_to_delete = calculate_diff(
