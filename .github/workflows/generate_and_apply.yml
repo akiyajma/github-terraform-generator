@@ -38,6 +38,7 @@ jobs:
       - name: Install pip-tools and dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install pip-tools --break-system-packages
           pip-sync requirements.txt
 
       - name: Run resource management script
