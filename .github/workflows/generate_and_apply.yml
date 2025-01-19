@@ -42,6 +42,12 @@ jobs:
           pip install pip-tools --break-system-packages
           pip-sync requirements.txt
 
+      - name: Before
+        run: |
+          ls -l
+          cat terraform.tfstate
+        working-directory: ./terraform
+
       - name: Run resource management script
         run: |
           python main.py
