@@ -57,6 +57,12 @@ jobs:
           REPOSITORIES: ${{ inputs.repositories }}
           TEAMS: ${{ inputs.teams }}
 
+      - name: Debug Environment Variables
+        run: |
+          echo "TF_VAR_github_token=$TF_VAR_github_token"
+        env:
+          TF_VAR_github_token: ${{ secrets.GIST_GITHUB_TOKEN }}
+
       - name: Terraform Init
         if: success()
         run: terraform init
