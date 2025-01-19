@@ -172,3 +172,15 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+####
+# Terraform
+####
+# Exclude all files and directories under the terraform directory
+
+# If you want to exclude specific types of files within terraform directory
+/terraform/**/.terraform/*
+/terraform/**/crash.log
+/terraform/**/crash.*.log
+/terraform/**/existing_resources.json
+/terraform/**/.terraform.tfstate.lock.info
