@@ -15,5 +15,4 @@ provider "github" {
 variable "github_token" {
   description = "The GitHub token used for authentication"
   type        = string
-  default     = ""
 }
