@@ -2,5 +2,7 @@ resource "github_repository" "{{ repository_name }}" {
   name               = "{{ repository_name }}"
   description        = "{{ description }}"
   visibility         = "{{ visibility }}"
+  {% if gitignore_template and gitignore_template != "None" %}
   gitignore_template = "{{ gitignore_template }}"
+  {% endif %}
 }
