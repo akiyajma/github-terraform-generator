@@ -9,17 +9,23 @@ def generate_team(team: Team, template_dir: str, output_dir: str):
     """
     Generate a Terraform configuration file for a GitHub team.
 
-    This function takes a `Team` object or a dictionary with team attributes, validates
-    the input, and generates a Terraform configuration file by rendering a Jinja2 template.
-    The output file is saved in the specified directory.
+    This function processes the provided `Team` object or a dictionary with team attributes,
+    and generates a Terraform configuration file using a Jinja2 template. During this process,
+    it sanitizes the `username` field of each team member by removing:
+    - Everything after the `@` character.
+    - Any `.` characters before the `@` character.
+
+    The resulting Terraform configuration is saved as a file in the specified directory.
 
     Args:
-        team (Team or dict): A `Team` object or dictionary with the following attributes:
+        team (Team or dict): A `Team` object or a dictionary with the following attributes:
             - `team_name` (str): The name of the team.
             - `description` (str, optional): A description of the team.
             - `privacy` (str): The privacy level of the team (e.g., "closed", "secret").
             - `members` (list[dict], optional): A list of team members, where each member
-              is represented as a dictionary with `username` and `role` keys.
+              is represented as a dictionary with:
+                - `username` (str): The GitHub username of the member.
+                - `role` (str): The role of the member (e.g., "maintainer", "member").
         template_dir (str): The directory containing the Jinja2 template files.
         output_dir (str): The directory where the Terraform configuration file will be saved.
 
@@ -33,11 +39,16 @@ def generate_team(team: Team, template_dir: str, output_dir: str):
                 team_name="dev-team",
                 description="Development team",
                 privacy="closed",
-                members=[{"username": "dev1", "role": "maintainer"}]
+                members=[
+                    {"username": "dev.user@example.com", "role": "maintainer"},
+                    {"username": "john.doe@domain.com", "role": "member"}
+                ]
             )
         >>> generate_team(team, "templates", "output")
 
     Notes:
+        - The `username` field of each member is sanitized:
+          For example, `john.doe@domain.com` becomes `johndoe`.
         - The Jinja2 template file should be named `team.tf.j2` and located in `template_dir`.
         - The output file will be saved as `<team_name>_team.tf` in the specified `output_dir`.
         - If a dictionary is passed instead of a `Team` object, it will be converted internally.
@@ -46,6 +57,10 @@ def generate_team(team: Team, template_dir: str, output_dir: str):
     try:
         if isinstance(team, dict):
             team = Team(**team)
+
+        for member in team.members:
+            username_before_at = member.username.split('@')[0]
+            member.username = username_before_at.replace('.', '')
 
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template("team.tf.j2")
