@@ -56,17 +56,23 @@ el.replaceWith(d);
     &#34;&#34;&#34;
     Generate a Terraform configuration file for a GitHub team.
 
-    This function takes a `Team` object or a dictionary with team attributes, validates
-    the input, and generates a Terraform configuration file by rendering a Jinja2 template.
-    The output file is saved in the specified directory.
+    This function processes the provided `Team` object or a dictionary with team attributes,
+    and generates a Terraform configuration file using a Jinja2 template. During this process,
+    it sanitizes the `username` field of each team member by removing:
+    - Everything after the `@` character.
+    - Any `.` characters before the `@` character.
+
+    The resulting Terraform configuration is saved as a file in the specified directory.
 
     Args:
-        team (Team or dict): A `Team` object or dictionary with the following attributes:
+        team (Team or dict): A `Team` object or a dictionary with the following attributes:
             - `team_name` (str): The name of the team.
             - `description` (str, optional): A description of the team.
             - `privacy` (str): The privacy level of the team (e.g., &#34;closed&#34;, &#34;secret&#34;).
             - `members` (list[dict], optional): A list of team members, where each member
-              is represented as a dictionary with `username` and `role` keys.
+              is represented as a dictionary with:
+                - `username` (str): The GitHub username of the member.
+                - `role` (str): The role of the member (e.g., &#34;maintainer&#34;, &#34;member&#34;).
         template_dir (str): The directory containing the Jinja2 template files.
         output_dir (str): The directory where the Terraform configuration file will be saved.
 
@@ -80,11 +86,16 @@ el.replaceWith(d);
                 team_name=&#34;dev-team&#34;,
                 description=&#34;Development team&#34;,
                 privacy=&#34;closed&#34;,
-                members=[{&#34;username&#34;: &#34;dev1&#34;, &#34;role&#34;: &#34;maintainer&#34;}]
+                members=[
+                    {&#34;username&#34;: &#34;dev.user@example.com&#34;, &#34;role&#34;: &#34;maintainer&#34;},
+                    {&#34;username&#34;: &#34;john.doe@domain.com&#34;, &#34;role&#34;: &#34;member&#34;}
+                ]
             )
         &gt;&gt;&gt; generate_team(team, &#34;templates&#34;, &#34;output&#34;)
 
     Notes:
+        - The `username` field of each member is sanitized:
+          For example, `john.doe@domain.com` becomes `johndoe`.
         - The Jinja2 template file should be named `team.tf.j2` and located in `template_dir`.
         - The output file will be saved as `&lt;team_name&gt;_team.tf` in the specified `output_dir`.
         - If a dictionary is passed instead of a `Team` object, it will be converted internally.
@@ -93,6 +104,10 @@ el.replaceWith(d);
     try:
         if isinstance(team, dict):
             team = Team(**team)
+
+        for member in team.members:
+            username_before_at = member.username.split(&#39;@&#39;)[0]
+            member.username = username_before_at.replace(&#39;.&#39;, &#39;&#39;)
 
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template(&#34;team.tf.j2&#34;)
@@ -110,18 +125,23 @@ el.replaceWith(d);
         raise Exception(f&#34;Error generating Terraform file for team: {e}&#34;)</code></pre>
 </details>
 <div class="desc"><p>Generate a Terraform configuration file for a GitHub team.</p>
-<p>This function takes a <code>Team</code> object or a dictionary with team attributes, validates
-the input, and generates a Terraform configuration file by rendering a Jinja2 template.
-The output file is saved in the specified directory.</p>
+<p>This function processes the provided <code>Team</code> object or a dictionary with team attributes,
+and generates a Terraform configuration file using a Jinja2 template. During this process,
+it sanitizes the <code>username</code> field of each team member by removing:
+- Everything after the <code>@</code> character.
+- Any <code>.</code> characters before the <code>@</code> character.</p>
+<p>The resulting Terraform configuration is saved as a file in the specified directory.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>team</code></strong> :&ensp;<code>Team</code> or <code>dict</code></dt>
-<dd>A <code>Team</code> object or dictionary with the following attributes:
+<dd>A <code>Team</code> object or a dictionary with the following attributes:
 - <code>team_name</code> (str): The name of the team.
 - <code>description</code> (str, optional): A description of the team.
 - <code>privacy</code> (str): The privacy level of the team (e.g., "closed", "secret").
 - <code>members</code> (list[dict], optional): A list of team members, where each member
-is represented as a dictionary with <code>username</code> and <code>role</code> keys.</dd>
+is represented as a dictionary with:
+- <code>username</code> (str): The GitHub username of the member.
+- <code>role</code> (str): The role of the member (e.g., "maintainer", "member").</dd>
 <dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
 <dd>The directory containing the Jinja2 template files.</dd>
 <dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
@@ -141,12 +161,17 @@ is represented as a dictionary with <code>username</code> and <code>role</code> 
         team_name=&quot;dev-team&quot;,
         description=&quot;Development team&quot;,
         privacy=&quot;closed&quot;,
-        members=[{&quot;username&quot;: &quot;dev1&quot;, &quot;role&quot;: &quot;maintainer&quot;}]
+        members=[
+            {&quot;username&quot;: &quot;dev.user@example.com&quot;, &quot;role&quot;: &quot;maintainer&quot;},
+            {&quot;username&quot;: &quot;john.doe@domain.com&quot;, &quot;role&quot;: &quot;member&quot;}
+        ]
     )
 &gt;&gt;&gt; generate_team(team, &quot;templates&quot;, &quot;output&quot;)
 </code></pre>
 <h2 id="notes">Notes</h2>
 <ul>
+<li>The <code>username</code> field of each member is sanitized:
+For example, <code>john.doe@domain.com</code> becomes <code>johndoe</code>.</li>
 <li>The Jinja2 template file should be named <code>team.tf.j2</code> and located in <code>template_dir</code>.</li>
 <li>The output file will be saved as <code>&lt;team_name&gt;_team.tf</code> in the specified <code>output_dir</code>.</li>
 <li>If a dictionary is passed instead of a <code>Team</code> object, it will be converted internally.</li>
