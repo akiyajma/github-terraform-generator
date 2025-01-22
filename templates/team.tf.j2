@@ -5,7 +5,7 @@ resource "github_team" "{{ team_name }}" {
 }
 
 {% for member in members %}
-resource "github_team_membership" "{{ team_name }}_{{ member.username.split('@')[0] }}" {
+resource "github_team_membership" "{{ team_name }}_{{ member.username.split('@')[0].replace('.', '') }}" {
   team_id  = github_team.{{ team_name }}.id
   username = "{{ member.username }}"
   role     = "{{ member.role }}"
