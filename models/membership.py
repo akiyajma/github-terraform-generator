@@ -1,21 +1,15 @@
-class Membership:
+from pydantic import BaseModel, Field
+
+
+class Membership(BaseModel):
     """
-    A model representing a GitHub membership.
+    GitHub Membership のモデル
 
     Attributes:
-        username (str): The GitHub username.
-        role (str): The role in the organization (default is "member").
+        username (str): ユーザー名。
+        role (str): メンバーシップの役割 ("member" または "admin")。
+        allow_delete (bool): 削除可能かどうかのフラグ。デフォルトは False。
     """
-
-    def __init__(self, username: str, role: str = "member"):
-        self.username = username
-        self.role = role  # role は渡された値を使い、なければ "member"
-
-    def to_dict(self):
-        """
-        Convert the Membership object into a dictionary.
-
-        Returns:
-            dict: A dictionary representation of the Membership object.
-        """
-        return {"username": self.username, "role": self.role}
+    username: str
+    role: str = Field(..., pattern="^(member|admin)$")
+    allow_delete: bool = False

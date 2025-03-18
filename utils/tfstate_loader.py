@@ -131,6 +131,7 @@ def extract_resources(tfstate):
     try:
         repositories = []
         teams = []
+        memberships = []
 
         for resource in tfstate.get("resources", []):
             if resource["type"] == "github_repository":
@@ -149,10 +150,17 @@ def extract_resources(tfstate):
                         "team_name": attributes["name"],
                         "description": attributes.get("description", ""),
                         "privacy": attributes["privacy"],
-                        "members": []  # Add members if present in future requirements
+                        "members": []  # 将来的にメンバー情報を追加する場合
+                    })
+            elif resource["type"] == "github_membership":
+                for instance in resource.get("instances", []):
+                    attributes = instance.get("attributes", {})
+                    memberships.append({
+                        "username": attributes["username"],
+                        "role": attributes["role"]
                     })
 
-        return {"repositories": repositories, "teams": teams}
+        return {"repositories": repositories, "teams": teams, "memberships": memberships}
     except KeyError as e:
         raise KeyError(f"Missing expected key in tfstate: {e}")
     except Exception as e:

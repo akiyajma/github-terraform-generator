@@ -71,8 +71,8 @@ def test_main_repo_addition(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the addition of a new repository.
 
-    This test verifies that the `main` function correctly identifies a new repository
-    (with attributes such as `repository_name`, `description`, and `gitignore_template`)
+    This test verifies that the `main` function correctly identifies a new repository 
+    (with attributes such as `repository_name`, `description`, and `gitignore_template`) 
     in the requested state and generates a corresponding Terraform configuration file.
 
     Steps:
@@ -105,8 +105,8 @@ def test_main_repo_update(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the update of an existing repository.
 
-    This test verifies that the `main` function detects attribute changes (e.g., `description`,
-    `visibility`) in an existing repository and updates the corresponding Terraform
+    This test verifies that the `main` function detects attribute changes (e.g., `description`, 
+    `visibility`) in an existing repository and updates the corresponding Terraform 
     configuration file.
 
     Steps:
@@ -143,8 +143,8 @@ def test_main_repo_deletion(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the deletion of a repository.
 
-    This test verifies that the `main` function identifies repositories present in the
-    existing state but not in the requested state and deletes the corresponding
+    This test verifies that the `main` function identifies repositories present in the 
+    existing state but not in the requested state and deletes the corresponding 
     Terraform configuration files.
 
     Steps:
@@ -174,8 +174,8 @@ def test_main_team_addition(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the addition of a new team.
 
-    This test verifies that the `main` function correctly identifies a new team
-    (with attributes such as `team_name`, `description`, and `privacy`) in the requested
+    This test verifies that the `main` function correctly identifies a new team 
+    (with attributes such as `team_name`, `description`, and `privacy`) in the requested 
     state and generates a corresponding Terraform configuration file.
 
     Steps:
@@ -208,8 +208,8 @@ def test_main_team_update(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the update of an existing team.
 
-    This test verifies that the `main` function detects attribute changes (e.g.,
-    `description`, `privacy`) in an existing team and updates the corresponding Terraform
+    This test verifies that the `main` function detects attribute changes (e.g., 
+    `description`, `privacy`) in an existing team and updates the corresponding Terraform 
     configuration file.
 
     Steps:
@@ -246,8 +246,8 @@ def test_main_team_deletion(monkeypatch, tmpdir, create_tfstate_file):
     """
     Test the deletion of a team.
 
-    This test verifies that the `main` function identifies teams present in the existing
-    state but not in the requested state and deletes the corresponding Terraform
+    This test verifies that the `main` function identifies teams present in the existing 
+    state but not in the requested state and deletes the corresponding Terraform 
     configuration files.
 
     Steps:
