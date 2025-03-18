@@ -103,6 +103,7 @@ el.replaceWith(d);
     try:
         repositories = []
         teams = []
+        memberships = []
 
         for resource in tfstate.get(&#34;resources&#34;, []):
             if resource[&#34;type&#34;] == &#34;github_repository&#34;:
@@ -121,10 +122,17 @@ el.replaceWith(d);
                         &#34;team_name&#34;: attributes[&#34;name&#34;],
                         &#34;description&#34;: attributes.get(&#34;description&#34;, &#34;&#34;),
                         &#34;privacy&#34;: attributes[&#34;privacy&#34;],
-                        &#34;members&#34;: []  # Add members if present in future requirements
+                        &#34;members&#34;: []  # 将来的にメンバー情報を追加する場合
+                    })
+            elif resource[&#34;type&#34;] == &#34;github_membership&#34;:
+                for instance in resource.get(&#34;instances&#34;, []):
+                    attributes = instance.get(&#34;attributes&#34;, {})
+                    memberships.append({
+                        &#34;username&#34;: attributes[&#34;username&#34;],
+                        &#34;role&#34;: attributes[&#34;role&#34;]
                     })
 
-        return {&#34;repositories&#34;: repositories, &#34;teams&#34;: teams}
+        return {&#34;repositories&#34;: repositories, &#34;teams&#34;: teams, &#34;memberships&#34;: memberships}
     except KeyError as e:
         raise KeyError(f&#34;Missing expected key in tfstate: {e}&#34;)
     except Exception as e:

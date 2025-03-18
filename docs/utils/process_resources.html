@@ -54,40 +54,43 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def process_memberships(generator, output_dir, memberships_to_add, memberships_to_update, memberships_to_delete):
     &#34;&#34;&#34;
-    Handle membership lifecycle: addition, update, and deletion.
+    GitHub Membership の追加・更新・削除を処理する
     &#34;&#34;&#34;
-    # Process additions
-    for membership in memberships_to_add:
-        try:
-            generator.generate_membership(membership, action=&#34;create&#34;)
-        except Exception as e:
-            raise Exception(
-                f&#34;Error adding membership for &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+    try:
+        # 追加処理
+        for membership in memberships_to_add:
+            try:
+                generator.generate_membership(membership)
+            except Exception as e:
+                raise Exception(
+                    f&#34;Error adding membership &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
 
-    # Process updates
-    for membership in memberships_to_update:
-        try:
-            generator.generate_membership(membership, action=&#34;update&#34;)
-        except Exception as e:
-            raise Exception(
-                f&#34;Error updating membership for &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+        # 更新処理
+        for membership in memberships_to_update:
+            try:
+                generator.generate_membership(membership)
+            except Exception as e:
+                raise Exception(
+                    f&#34;Error updating membership &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
 
-    # Process deletions
-    for membership in memberships_to_delete:
-        try:
-            tf_file = os.path.join(
-                output_dir, f&#34;{membership[&#39;username&#39;]}_membership.tf&#34;)
-            if os.path.exists(tf_file):
-                os.remove(tf_file)
-                logger.info(f&#34;Deleted Terraform file: {tf_file}&#34;)
-            else:
-                logger.warning(
-                    f&#34;Terraform file not found for deletion: {tf_file}&#34;)
-        except Exception as e:
-            raise Exception(
-                f&#34;Error deleting membership for &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)</code></pre>
+        # 削除処理
+        for membership in memberships_to_delete:
+            try:
+                tf_file = os.path.join(
+                    output_dir, f&#34;{membership[&#39;username&#39;]}_membership.tf&#34;)
+                if os.path.exists(tf_file):
+                    os.remove(tf_file)
+                    logger.info(f&#34;Deleted Terraform file: {tf_file}&#34;)
+                else:
+                    logger.warning(
+                        f&#34;Terraform file not found for deletion: {tf_file}&#34;)
+            except Exception as e:
+                raise Exception(
+                    f&#34;Error deleting membership &#39;{membership.get(&#39;username&#39;, &#39;unknown&#39;)}&#39;: {e}&#34;)
+    except Exception as e:
+        raise Exception(f&#34;Unexpected error processing memberships: {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Handle membership lifecycle: addition, update, and deletion.</p></div>
+<div class="desc"><p>GitHub Membership の追加・更新・削除を処理する</p></div>
 </dd>
 <dt id="github-terraform-generator.utils.process_resources.process_repositories"><code class="name flex">
 <span>def <span class="ident">process_repositories</span></span>(<span>generator, output_dir, repos_to_add, repos_to_update, repos_to_delete)</span>
@@ -208,83 +211,45 @@ repos_to_delete=[
 )</p></div>
 </dd>
 <dt id="github-terraform-generator.utils.process_resources.process_resources"><code class="name flex">
-<span>def <span class="ident">process_resources</span></span>(<span>template_dir,<br>output_dir,<br>resource_changes: utils.resource_changes.ResourceChanges)</span>
+<span>def <span class="ident">process_resources</span></span>(<span>template_dir, output_dir, resource_changes)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def process_resources(template_dir, output_dir, resource_changes: ResourceChanges):
-    &#34;&#34;&#34;
-    Orchestrate the processing of repositories, teams, and memberships for addition, update, and deletion.
-
-    Args:
-        template_dir (str): The directory containing Jinja2 templates for Terraform files.
-        output_dir (str): The directory where Terraform files will be generated or deleted.
-        resource_changes (ResourceChanges): An object containing changes to repositories, teams, and memberships.
-
-    Raises:
-        Exception: If an error occurs during processing.
-
-    Example:
-        resource_changes = ResourceChanges(
-            repos_to_add=[{&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;}],
-            teams_to_add=[{&#34;team_name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;}],
-            memberships_to_add=[{&#34;username&#34;: &#34;user1&#34;}]
-        )
-        process_resources(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;, resource_changes=resource_changes)
-    &#34;&#34;&#34;
+<pre><code class="python">def process_resources(template_dir, output_dir, resource_changes):
     try:
         generator = TerraformGenerator(template_dir, output_dir)
-
+        # リポジトリの処理
         process_repositories(
-            generator, output_dir,
+            generator,
+            output_dir,
             resource_changes.repos_to_add,
             resource_changes.repos_to_update,
             resource_changes.repos_to_delete,
         )
-
+        # チームの処理
         process_teams(
-            generator, output_dir,
+            generator,
+            output_dir,
             resource_changes.teams_to_add,
             resource_changes.teams_to_update,
             resource_changes.teams_to_delete,
         )
-
+        # Membership の処理を追加
         process_memberships(
-            generator, output_dir,
+            generator,
+            output_dir,
             resource_changes.memberships_to_add,
             resource_changes.memberships_to_update,
-            resource_changes.memberships_to_delete
+            resource_changes.memberships_to_delete,
         )
-
         logger.info(&#34;Resource processing completed successfully.&#34;)
     except Exception as e:
         raise Exception(f&#34;Resource processing failed: {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Orchestrate the processing of repositories, teams, and memberships for addition, update, and deletion.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>The directory containing Jinja2 templates for Terraform files.</dd>
-<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>The directory where Terraform files will be generated or deleted.</dd>
-<dt><strong><code>resource_changes</code></strong> :&ensp;<code>ResourceChanges</code></dt>
-<dd>An object containing changes to repositories, teams, and memberships.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>Exception</code></dt>
-<dd>If an error occurs during processing.</dd>
-</dl>
-<h2 id="example">Example</h2>
-<p>resource_changes = ResourceChanges(
-repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
-teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
-memberships_to_add=[{"username": "user1"}]
-)
-process_resources(template_dir="templates", output_dir="output", resource_changes=resource_changes)</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="github-terraform-generator.utils.process_resources.process_teams"><code class="name flex">
 <span>def <span class="ident">process_teams</span></span>(<span>generator, output_dir, teams_to_add, teams_to_update, teams_to_delete)</span>
