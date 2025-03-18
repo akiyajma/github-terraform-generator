@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="github-terraform-generator.utils.resource_changes.ResourceChanges"><code class="flex name class">
 <span>class <span class="ident">ResourceChanges</span></span>
-<span>(</span><span>repos_to_add,<br>repos_to_update,<br>repos_to_delete,<br>teams_to_add,<br>teams_to_update,<br>teams_to_delete)</span>
+<span>(</span><span>repos_to_add,<br>repos_to_update,<br>repos_to_delete,<br>teams_to_add,<br>teams_to_update,<br>teams_to_delete,<br>memberships_to_add,<br>memberships_to_update,<br>memberships_to_delete)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -106,51 +106,17 @@ el.replaceWith(d);
     &#34;&#34;&#34;
 
     def __init__(self, repos_to_add, repos_to_update, repos_to_delete,
-                 teams_to_add, teams_to_update, teams_to_delete):
-        &#34;&#34;&#34;
-        Initialize the ResourceChanges instance with lists of changes.
-
-        Args:
-            repos_to_add (list[dict]): A list of repositories to add, where each dictionary
-                contains repository attributes such as `repository_name`, `visibility`,
-                `description`, and `gitignore_template`. Exclude `gitignore_template` if set to &#34;None&#34;.
-            repos_to_update (list[dict]): A list of repositories to update, with similar attributes
-                as `repos_to_add`.
-            repos_to_delete (list[dict]): A list of repositories to delete, identified by `repository_name`.
-            teams_to_add (list[dict]): A list of teams to add, where each dictionary contains
-                attributes such as `team_name`, `privacy`, `description`, and `members`.
-            teams_to_update (list[dict]): A list of teams to update, with similar attributes
-                as `teams_to_add`.
-            teams_to_delete (list[dict]): A list of teams to delete, identified by `team_name`.
-
-        Example:
-            ResourceChanges(
-                repos_to_add=[
-                    {&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;description&#34;: &#34;A public repo&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;}
-                ],
-                repos_to_update=[
-                    {&#34;repository_name&#34;: &#34;repo2&#34;, &#34;visibility&#34;: &#34;private&#34;, &#34;description&#34;: &#34;Updated repo&#34;, &#34;gitignore_template&#34;: &#34;None&#34;}
-                ],
-                repos_to_delete=[
-                    {&#34;repository_name&#34;: &#34;repo3&#34;}
-                ],
-                teams_to_add=[
-                    {&#34;team_name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;, &#34;description&#34;: &#34;New team&#34;, &#34;members&#34;: [{&#34;username&#34;: &#34;user1&#34;, &#34;role&#34;: &#34;maintainer&#34;}]}
-                ],
-                teams_to_update=[
-                    {&#34;team_name&#34;: &#34;team2&#34;, &#34;privacy&#34;: &#34;secret&#34;, &#34;description&#34;: &#34;Updated team&#34;}
-                ],
-                teams_to_delete=[
-                    {&#34;team_name&#34;: &#34;team3&#34;}
-                ]
-            )
-        &#34;&#34;&#34;
+                 teams_to_add, teams_to_update, teams_to_delete,
+                 memberships_to_add, memberships_to_update, memberships_to_delete):
         self.repos_to_add = repos_to_add
         self.repos_to_update = repos_to_update
         self.repos_to_delete = repos_to_delete
         self.teams_to_add = teams_to_add
         self.teams_to_update = teams_to_update
-        self.teams_to_delete = teams_to_delete</code></pre>
+        self.teams_to_delete = teams_to_delete
+        self.memberships_to_add = memberships_to_add
+        self.memberships_to_update = memberships_to_update
+        self.memberships_to_delete = memberships_to_delete</code></pre>
 </details>
 <div class="desc"><p>Represents the changes to be applied to resources (repositories and teams).</p>
 <p>This class encapsulates lists of repositories and teams to add, update, or delete,
@@ -184,48 +150,6 @@ and <code>description</code> for teams to ensure detailed resource definitions.<
 </dl>
 <h2 id="example">Example</h2>
 <p>resource_changes = ResourceChanges(
-repos_to_add=[
-{"repository_name": "repo1", "visibility": "public", "description": "A public repo", "gitignore_template": "Python"}
-],
-repos_to_update=[
-{"repository_name": "repo2", "visibility": "private", "description": "Updated repo", "gitignore_template": "None"}
-],
-repos_to_delete=[
-{"repository_name": "repo3"}
-],
-teams_to_add=[
-{"team_name": "team1", "privacy": "closed", "description": "New team", "members": [{"username": "user1", "role": "maintainer"}]}
-],
-teams_to_update=[
-{"team_name": "team2", "privacy": "secret", "description": "Updated team"}
-],
-teams_to_delete=[
-{"team_name": "team3"}
-]
-)</p>
-<p>Initialize the ResourceChanges instance with lists of changes.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>repos_to_add</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of repositories to add, where each dictionary
-contains repository attributes such as <code>repository_name</code>, <code>visibility</code>,
-<code>description</code>, and <code>gitignore_template</code>. Exclude <code>gitignore_template</code> if set to "None".</dd>
-<dt><strong><code>repos_to_update</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of repositories to update, with similar attributes
-as <code>repos_to_add</code>.</dd>
-<dt><strong><code>repos_to_delete</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of repositories to delete, identified by <code>repository_name</code>.</dd>
-<dt><strong><code>teams_to_add</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of teams to add, where each dictionary contains
-attributes such as <code>team_name</code>, <code>privacy</code>, <code>description</code>, and <code>members</code>.</dd>
-<dt><strong><code>teams_to_update</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of teams to update, with similar attributes
-as <code>teams_to_add</code>.</dd>
-<dt><strong><code>teams_to_delete</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>A list of teams to delete, identified by <code>team_name</code>.</dd>
-</dl>
-<h2 id="example_1">Example</h2>
-<p>ResourceChanges(
 repos_to_add=[
 {"repository_name": "repo1", "visibility": "public", "description": "A public repo", "gitignore_template": "Python"}
 ],

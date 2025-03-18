@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>github-terraform-generator.tests API documentation</title>
+<title>github-terraform-generator.tests.test_membership_generator API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,56 +33,150 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>github-terraform-generator.tests</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.tests.test_membership_generator</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_config_loader" href="test_config_loader.html">github-terraform-generator.tests.test_config_loader</a></code></dt>
+<dt id="github-terraform-generator.tests.test_membership_generator.membership"><code class="name flex">
+<span>def <span class="ident">membership</span></span>(<span>)</span>
+</code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def membership():
+    return Membership(username=&#34;testuser&#34;)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_diff_calculator" href="test_diff_calculator.html">github-terraform-generator.tests.test_diff_calculator</a></code></dt>
+<dt id="github-terraform-generator.tests.test_membership_generator.test_generate_membership_create"><code class="name flex">
+<span>def <span class="ident">test_generate_membership_create</span></span>(<span>membership, tmp_path)</span>
+</code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_membership_create(membership, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir /
+     &#34;membership.tf.j2&#34;).write_text(&#34;{{ membership.username }} {{ action }}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    generate_membership(membership, str(template_dir),
+                        str(output_dir), action=&#34;create&#34;)
+
+    output_file = output_dir / &#34;testuser_membership.tf&#34;
+    assert output_file.read_text() == &#34;testuser create&#34;</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_generator" href="test_generator.html">github-terraform-generator.tests.test_generator</a></code></dt>
+<dt id="github-terraform-generator.tests.test_membership_generator.test_generate_membership_delete"><code class="name flex">
+<span>def <span class="ident">test_generate_membership_delete</span></span>(<span>membership, tmp_path)</span>
+</code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_membership_delete(membership, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir /
+     &#34;membership.tf.j2&#34;).write_text(&#34;{{ membership.username }} {{ action }}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    generate_membership(membership, str(template_dir),
+                        str(output_dir), action=&#34;delete&#34;)
+
+    output_file = output_dir / &#34;testuser_membership.tf&#34;
+    assert output_file.read_text() == &#34;testuser delete&#34;</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_main" href="test_main.html">github-terraform-generator.tests.test_main</a></code></dt>
+<dt id="github-terraform-generator.tests.test_membership_generator.test_generate_membership_invalid_action"><code class="name flex">
+<span>def <span class="ident">test_generate_membership_invalid_action</span></span>(<span>membership, tmp_path)</span>
+</code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_membership_invalid_action(membership, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir /
+     &#34;membership.tf.j2&#34;).write_text(&#34;{{ membership.username }} {{ action }}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    with pytest.raises(ValueError, match=&#34;Invalid action. Must be &#39;create&#39;, &#39;update&#39;, or &#39;delete&#39;.&#34;):
+        generate_membership(membership, str(template_dir),
+                            str(output_dir), action=&#34;invalid&#34;)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_membership_generator" href="test_membership_generator.html">github-terraform-generator.tests.test_membership_generator</a></code></dt>
+<dt id="github-terraform-generator.tests.test_membership_generator.test_generate_membership_update"><code class="name flex">
+<span>def <span class="ident">test_generate_membership_update</span></span>(<span>membership, tmp_path)</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_models" href="test_models.html">github-terraform-generator.tests.test_models</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_repository_generator" href="test_repository_generator.html">github-terraform-generator.tests.test_repository_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_team_generator" href="test_team_generator.html">github-terraform-generator.tests.test_team_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_tfstate_loader" href="test_tfstate_loader.html">github-terraform-generator.tests.test_tfstate_loader</a></code></dt>
-<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_membership_update(membership, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir /
+     &#34;membership.tf.j2&#34;).write_text(&#34;{{ membership.username }} {{ action }}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    generate_membership(membership, str(template_dir),
+                        str(output_dir), action=&#34;update&#34;)
+
+    output_file = output_dir / &#34;testuser_membership.tf&#34;
+    assert output_file.read_text() == &#34;testuser update&#34;</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
 </section>
 <section>
-</section>
-<section>
-</section>
-<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="github-terraform-generator.tests.test_membership_generator.Membership"><code class="flex name class">
+<span>class <span class="ident">Membership</span></span>
+<span>(</span><span>username)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Membership:
+    def __init__(self, username):
+        self.username = username</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -92,20 +186,23 @@ el.replaceWith(d);
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="github-terraform-generator" href="../index.html">github-terraform-generator</a></code></li>
+<li><code><a title="github-terraform-generator.tests" href="index.html">github-terraform-generator.tests</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="github-terraform-generator.tests.test_membership_generator.membership" href="#github-terraform-generator.tests.test_membership_generator.membership">membership</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_membership_generator.test_generate_membership_create" href="#github-terraform-generator.tests.test_membership_generator.test_generate_membership_create">test_generate_membership_create</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_membership_generator.test_generate_membership_delete" href="#github-terraform-generator.tests.test_membership_generator.test_generate_membership_delete">test_generate_membership_delete</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_membership_generator.test_generate_membership_invalid_action" href="#github-terraform-generator.tests.test_membership_generator.test_generate_membership_invalid_action">test_generate_membership_invalid_action</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_membership_generator.test_generate_membership_update" href="#github-terraform-generator.tests.test_membership_generator.test_generate_membership_update">test_generate_membership_update</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li><code><a title="github-terraform-generator.tests.test_config_loader" href="test_config_loader.html">github-terraform-generator.tests.test_config_loader</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_diff_calculator" href="test_diff_calculator.html">github-terraform-generator.tests.test_diff_calculator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_generator" href="test_generator.html">github-terraform-generator.tests.test_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_main" href="test_main.html">github-terraform-generator.tests.test_main</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_membership_generator" href="test_membership_generator.html">github-terraform-generator.tests.test_membership_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_models" href="test_models.html">github-terraform-generator.tests.test_models</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_repository_generator" href="test_repository_generator.html">github-terraform-generator.tests.test_repository_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_team_generator" href="test_team_generator.html">github-terraform-generator.tests.test_team_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_tfstate_loader" href="test_tfstate_loader.html">github-terraform-generator.tests.test_tfstate_loader</a></code></li>
+<li>
+<h4><code><a title="github-terraform-generator.tests.test_membership_generator.Membership" href="#github-terraform-generator.tests.test_membership_generator.Membership">Membership</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

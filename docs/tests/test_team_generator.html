@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>github-terraform-generator.generator.terraform_generator API documentation</title>
+<title>github-terraform-generator.tests.test_team_generator API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,7 +33,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>github-terraform-generator.generator.terraform_generator</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.tests.test_team_generator</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -42,110 +42,148 @@ el.replaceWith(d);
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="github-terraform-generator.tests.test_team_generator.team_dict"><code class="name flex">
+<span>def <span class="ident">team_dict</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def team_dict():
+    return {
+        &#34;team_name&#34;: &#34;dev-team&#34;,
+        &#34;description&#34;: &#34;Development team&#34;,
+        &#34;privacy&#34;: &#34;closed&#34;,
+        &#34;members&#34;: [
+            {&#34;username&#34;: &#34;dev.user@example.com&#34;, &#34;role&#34;: &#34;maintainer&#34;},
+            {&#34;username&#34;: &#34;john.doe@domain.com&#34;, &#34;role&#34;: &#34;member&#34;}
+        ]
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_team_generator.team_obj"><code class="name flex">
+<span>def <span class="ident">team_obj</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def team_obj():
+    return Team(
+        team_name=&#34;dev-team&#34;,
+        description=&#34;Development team&#34;,
+        privacy=&#34;closed&#34;,
+        members=[
+            {&#34;username&#34;: &#34;dev.user@example.com&#34;, &#34;role&#34;: &#34;maintainer&#34;},
+            {&#34;username&#34;: &#34;john.doe@domain.com&#34;, &#34;role&#34;: &#34;member&#34;}
+        ]
+    )</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_team_generator.test_generate_team_invalid_data"><code class="name flex">
+<span>def <span class="ident">test_generate_team_invalid_data</span></span>(<span>tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_team_invalid_data(tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir / &#34;team.tf.j2&#34;).write_text(
+        &#34;{{ team_name }} {{ description }} {{ privacy }} {% for member in members %}{{ member.username.split(&#39;@&#39;)[0] }} {{ member.role }} {% endfor %}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    with pytest.raises(Exception, match=&#34;Error generating Terraform file for team:&#34;):
+        generate_team({}, str(template_dir), str(output_dir))</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_team_generator.test_generate_team_template_not_found"><code class="name flex">
+<span>def <span class="ident">test_generate_team_template_not_found</span></span>(<span>mock_write, team_dict, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@patch(&#34;generator.team_generator._write_to_file&#34;)
+def test_generate_team_template_not_found(mock_write, team_dict, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    with pytest.raises(Exception, match=&#34;Error generating Terraform file for team:&#34;):
+        generate_team(team_dict, str(template_dir), str(output_dir))</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_team_generator.test_generate_team_with_dict"><code class="name flex">
+<span>def <span class="ident">test_generate_team_with_dict</span></span>(<span>team_dict, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_team_with_dict(team_dict, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir / &#34;team.tf.j2&#34;).write_text(
+        &#34;{{ team_name }} {{ description }} {{ privacy }} {% for member in members %}{{ member.username.split(&#39;@&#39;)[0] }} {{ member.role }} {% endfor %}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    generate_team(team_dict, str(template_dir), str(output_dir))
+
+    output_file = output_dir / &#34;dev-team_team.tf&#34;
+    assert output_file.read_text(
+    ) == &#34;dev-team Development team closed dev.user maintainer john.doe member &#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="github-terraform-generator.tests.test_team_generator.test_generate_team_with_obj"><code class="name flex">
+<span>def <span class="ident">test_generate_team_with_obj</span></span>(<span>team_obj, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_team_with_obj(team_obj, tmp_path):
+    template_dir = tmp_path / &#34;templates&#34;
+    template_dir.mkdir()
+    (template_dir / &#34;team.tf.j2&#34;).write_text(
+        &#34;{{ team_name }} {{ description }} {{ privacy }} {% for member in members %}{{ member.username.split(&#39;@&#39;)[0] }} {{ member.role }} {% endfor %}&#34;)
+
+    output_dir = tmp_path / &#34;output&#34;
+    output_dir.mkdir()
+
+    generate_team(team_obj, str(template_dir), str(output_dir))
+
+    output_file = output_dir / &#34;dev-team_team.tf&#34;
+    assert output_file.read_text(
+    ) == &#34;dev-team Development team closed dev.user maintainer john.doe member &#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="github-terraform-generator.generator.terraform_generator.TerraformGenerator"><code class="flex name class">
-<span>class <span class="ident">TerraformGenerator</span></span>
-<span>(</span><span>template_dir, output_dir)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class TerraformGenerator:
-    def __init__(self, template_dir, output_dir):
-        self.template_dir = template_dir
-        self.output_dir = output_dir
-
-    def generate_repository(self, repository):
-        # Logic to generate Terraform file for a repository
-        tf_file_path = os.path.join(
-            self.output_dir, f&#34;{repository[&#39;repository_name&#39;]}_repository.tf&#34;)
-        with open(tf_file_path, &#39;w&#39;) as tf_file:
-            tf_file.write(f&#34;&#34;&#34;
-resource &#34;github_repository&#34; &#34;{repository[&#39;repository_name&#39;]}&#34; {{
-  name        = &#34;{repository[&#39;repository_name&#39;]}&#34;
-  description = &#34;{repository[&#39;description&#39;]}&#34;
-  visibility  = &#34;{repository[&#39;visibility&#39;]}&#34;
-  gitignore_template = &#34;{repository[&#39;gitignore_template&#39;] if repository[&#39;gitignore_template&#39;] != &#39;None&#39; else &#39;&#39;}&#34;
-}}
-&#34;&#34;&#34;)
-        logger.info(f&#34;Generated Terraform file for repository: {tf_file_path}&#34;)
-
-    def generate_team(self, team):
-        # Logic to generate Terraform file for a team
-        tf_file_path = os.path.join(
-            self.output_dir, f&#34;{team[&#39;team_name&#39;]}_team.tf&#34;)
-        with open(tf_file_path, &#39;w&#39;) as tf_file:
-            tf_file.write(f&#34;&#34;&#34;
-resource &#34;github_team&#34; &#34;{team[&#39;team_name&#39;]}&#34; {{
-  name        = &#34;{team[&#39;team_name&#39;]}&#34;
-  description = &#34;{team[&#39;description&#39;]}&#34;
-  privacy     = &#34;{team[&#39;privacy&#39;]}&#34;
-}}
-&#34;&#34;&#34;)
-        logger.info(f&#34;Generated Terraform file for team: {tf_file_path}&#34;)
-        logger.debug(f&#34;Generating team: {team[&#39;team_name&#39;]}&#34;)</code></pre>
-</details>
-<div class="desc"></div>
-<h3>Methods</h3>
-<dl>
-<dt id="github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_repository"><code class="name flex">
-<span>def <span class="ident">generate_repository</span></span>(<span>self, repository)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">    def generate_repository(self, repository):
-        # Logic to generate Terraform file for a repository
-        tf_file_path = os.path.join(
-            self.output_dir, f&#34;{repository[&#39;repository_name&#39;]}_repository.tf&#34;)
-        with open(tf_file_path, &#39;w&#39;) as tf_file:
-            tf_file.write(f&#34;&#34;&#34;
-resource &#34;github_repository&#34; &#34;{repository[&#39;repository_name&#39;]}&#34; {{
-  name        = &#34;{repository[&#39;repository_name&#39;]}&#34;
-  description = &#34;{repository[&#39;description&#39;]}&#34;
-  visibility  = &#34;{repository[&#39;visibility&#39;]}&#34;
-  gitignore_template = &#34;{repository[&#39;gitignore_template&#39;] if repository[&#39;gitignore_template&#39;] != &#39;None&#39; else &#39;&#39;}&#34;
-}}
-&#34;&#34;&#34;)
-        logger.info(f&#34;Generated Terraform file for repository: {tf_file_path}&#34;)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-<dt id="github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_team"><code class="name flex">
-<span>def <span class="ident">generate_team</span></span>(<span>self, team)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">    def generate_team(self, team):
-        # Logic to generate Terraform file for a team
-        tf_file_path = os.path.join(
-            self.output_dir, f&#34;{team[&#39;team_name&#39;]}_team.tf&#34;)
-        with open(tf_file_path, &#39;w&#39;) as tf_file:
-            tf_file.write(f&#34;&#34;&#34;
-resource &#34;github_team&#34; &#34;{team[&#39;team_name&#39;]}&#34; {{
-  name        = &#34;{team[&#39;team_name&#39;]}&#34;
-  description = &#34;{team[&#39;description&#39;]}&#34;
-  privacy     = &#34;{team[&#39;privacy&#39;]}&#34;
-}}
-&#34;&#34;&#34;)
-        logger.info(f&#34;Generated Terraform file for team: {tf_file_path}&#34;)
-        logger.debug(f&#34;Generating team: {team[&#39;team_name&#39;]}&#34;)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-</dl>
-</dd>
-</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -155,18 +193,17 @@ resource &#34;github_team&#34; &#34;{team[&#39;team_name&#39;]}&#34; {{
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="github-terraform-generator.generator" href="index.html">github-terraform-generator.generator</a></code></li>
+<li><code><a title="github-terraform-generator.tests" href="index.html">github-terraform-generator.tests</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="github-terraform-generator.generator.terraform_generator.TerraformGenerator" href="#github-terraform-generator.generator.terraform_generator.TerraformGenerator">TerraformGenerator</a></code></h4>
+<li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_repository" href="#github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_repository">generate_repository</a></code></li>
-<li><code><a title="github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_team" href="#github-terraform-generator.generator.terraform_generator.TerraformGenerator.generate_team">generate_team</a></code></li>
-</ul>
-</li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.team_dict" href="#github-terraform-generator.tests.test_team_generator.team_dict">team_dict</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.team_obj" href="#github-terraform-generator.tests.test_team_generator.team_obj">team_obj</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.test_generate_team_invalid_data" href="#github-terraform-generator.tests.test_team_generator.test_generate_team_invalid_data">test_generate_team_invalid_data</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.test_generate_team_template_not_found" href="#github-terraform-generator.tests.test_team_generator.test_generate_team_template_not_found">test_generate_team_template_not_found</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.test_generate_team_with_dict" href="#github-terraform-generator.tests.test_team_generator.test_generate_team_with_dict">test_generate_team_with_dict</a></code></li>
+<li><code><a title="github-terraform-generator.tests.test_team_generator.test_generate_team_with_obj" href="#github-terraform-generator.tests.test_team_generator.test_generate_team_with_obj">test_generate_team_with_obj</a></code></li>
 </ul>
 </li>
 </ul>

@@ -60,7 +60,7 @@ el.replaceWith(d);
     It performs the following steps:
     1. Loads the application configuration from `config.yaml`.
     2. Loads the existing Terraform state from the specified file.
-    3. Extracts resources (repositories and teams) from the Terraform state.
+    3. Extracts resources (repositories, teams, and memberships) from the Terraform state.
     4. Compares the extracted resources with the new resources provided via environment variables,
        applying default values from `config.yaml` where applicable.
     5. Calculates the differences (additions, updates, deletions) between the existing and new resources.
@@ -82,6 +82,8 @@ el.replaceWith(d);
             - `description` (str, optional): A description of the team.
             - `privacy` (str): The privacy level of the team (e.g., &#34;closed&#34; or &#34;secret&#34;).
             - `members` (list[dict], optional): A list of team members with their roles.
+        MEMBERSHIPS (str): A JSON-encoded list of GitHub usernames for organization membership.
+            - Each username is assigned the role &#34;member&#34;.
 
     Configuration:
         The application configuration (`config.yaml`) includes:
@@ -124,36 +126,56 @@ el.replaceWith(d);
         existing_state = extract_resources(tfstate)
         save_existing_state(existing_state, state_file)
 
-        # Load new resources
+        # Load new resources from environment variables
         repositories_json = os.getenv(&#34;REPOSITORIES&#34;, &#34;[]&#34;)
         teams_json = os.getenv(&#34;TEAMS&#34;, &#34;[]&#34;)
+        memberships_json = os.getenv(&#34;MEMBERSHIPS&#34;, &#34;[]&#34;)
 
         default_repo_config = config[&#34;default_repository&#34;]
         default_team_config = config[&#34;default_team&#34;]
 
+        # Parse JSON and apply default values
         new_repositories = [
-            Repository(
-                **{**default_repo_config, **repo}
-            ) for repo in json.loads(repositories_json)
+            Repository(**{**default_repo_config, **repo})
+            for repo in json.loads(repositories_json)
         ]
         new_teams = [
-            Team(
-                **{**default_team_config, **team}
-            ) for team in json.loads(teams_json)
+            Team(**{**default_team_config, **team})
+            for team in json.loads(teams_json)
         ]
 
-        # Calculate differences
+        # --- Memberships Handling ---
+        # Ensure existing memberships is a valid list
+        existing_memberships = existing_state.get(&#34;memberships&#34;, [])
+        if not isinstance(existing_memberships, list):
+            existing_memberships = []
+
+        # Ensure all elements in existing_memberships are dictionaries
+        existing_memberships = [
+            m for m in existing_memberships if isinstance(m, dict)]
+
+        # Convert new memberships from environment variable
+        new_memberships = [Membership(username=membership)
+                           for membership in json.loads(memberships_json)]
+        new_memberships_dicts = [membership.to_dict()
+                                 for membership in new_memberships]
+
+        # Calculate differences for repositories, teams, and memberships
         repos_to_add, repos_to_update, repos_to_delete = calculate_diff(
-            existing_state[&#34;repositories&#34;], new_repositories, key=&#34;repository_name&#34;
+            existing_state.get(&#34;repositories&#34;, []), new_repositories, key=&#34;repository_name&#34;
         )
         teams_to_add, teams_to_update, teams_to_delete = calculate_diff(
-            existing_state[&#34;teams&#34;], new_teams, key=&#34;team_name&#34;
+            existing_state.get(&#34;teams&#34;, []), new_teams, key=&#34;team_name&#34;
+        )
+        memberships_to_add, memberships_to_update, memberships_to_delete = calculate_diff(
+            existing_memberships, new_memberships_dicts, key=&#34;username&#34;
         )
 
-        # Process resources
+        # Process resources including memberships with full lifecycle (add/update/delete)
         resource_changes = ResourceChanges(
             repos_to_add, repos_to_update, repos_to_delete,
-            teams_to_add, teams_to_update, teams_to_delete
+            teams_to_add, teams_to_update, teams_to_delete,
+            memberships_to_add, memberships_to_update, memberships_to_delete
         )
         process_resources(config[&#34;template_dir&#34;], output_dir, resource_changes)
 
@@ -168,7 +190,7 @@ el.replaceWith(d);
 It performs the following steps:
 1. Loads the application configuration from <code>config.yaml</code>.
 2. Loads the existing Terraform state from the specified file.
-3. Extracts resources (repositories and teams) from the Terraform state.
+3. Extracts resources (repositories, teams, and memberships) from the Terraform state.
 4. Compares the extracted resources with the new resources provided via environment variables,
 applying default values from <code>config.yaml</code> where applicable.
 5. Calculates the differences (additions, updates, deletions) between the existing and new resources.
@@ -190,7 +212,9 @@ TEAMS (str): A JSON-encoded list of team definitions. Each team should include:
 - <code>team_name</code> (str): The name of the team.
 - <code>description</code> (str, optional): A description of the team.
 - <code>privacy</code> (str): The privacy level of the team (e.g., "closed" or "secret").
-- <code>members</code> (list[dict], optional): A list of team members with their roles.</p>
+- <code>members</code> (list[dict], optional): A list of team members with their roles.
+MEMBERSHIPS (str): A JSON-encoded list of GitHub usernames for organization membership.
+- Each username is assigned the role "member".</p>
 <h2 id="configuration">Configuration</h2>
 <p>The application configuration (<code>config.yaml</code>) includes:
 - <code>default_repository</code> (dict): Default values for repository attributes, applied if not explicitly provided.

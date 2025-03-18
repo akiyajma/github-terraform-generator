@@ -103,28 +103,38 @@ el.replaceWith(d);
         - Errors encountered during the comparison process, including missing keys or attributes.
     &#34;&#34;&#34;
     try:
-        # Convert lists to dictionaries using the unique key
-        existing_dict = {item[key]: item for item in existing}
-        requested_dict = {getattr(item, key): item.model_dump()
-                          for item in requested}
+        # ヘルパー関数: アイテムが dict なら item[key]、それ以外なら getattr(item, key) を返す
+        def get_key(item):
+            if isinstance(item, dict):
+                return item[key]
+            else:
+                return getattr(item, key)
+
+        # 既存リソースをキーで辞書化
+        existing_dict = {get_key(item): item for item in existing}
+        # リクエスト側のリソースもキーで辞書化（itemが dict の場合はそのまま、オブジェクトなら model_dump() を使う）
+        requested_dict = {
+            get_key(item): (item if isinstance(item, dict) else item.model_dump())
+            for item in requested
+        }
 
         def normalize_dict(resource):
-            # Remove keys that should not affect comparison
+            # 比較に影響しないキーを除外
             ignored_keys = {&#34;allow_delete&#34;}
             return {k: v for k, v in resource.items() if k not in ignored_keys}
 
-        # Determine additions
+        # 追加対象: 既存にないリクエスト側のリソース
         to_add = [requested_dict[name]
                   for name in requested_dict if name not in existing_dict]
 
-        # Determine updates
+        # 更新対象: キーが共通だが内容が異なるリソース
         to_update = [
             requested_dict[name]
             for name in requested_dict
             if name in existing_dict and normalize_dict(existing_dict[name]) != normalize_dict(requested_dict[name])
         ]
 
-        # Determine deletions
+        # 削除対象: 既存にあるが、allow_delete が True のリソース（必要に応じて）
         to_delete = [
             existing_dict[name]
             for name in existing_dict
@@ -132,12 +142,13 @@ el.replaceWith(d);
         ]
 
         return to_add, to_update, to_delete
+
     except KeyError as e:
-        raise KeyError(f&#34;Missing required key &#39;{
-                       key}&#39; in existing resources: {e}&#34;)
+        raise KeyError(
+            f&#34;Missing required key &#39;{key}&#39; in existing resources: {e}&#34;)
     except AttributeError as e:
-        raise AttributeError(f&#34;Missing required attribute &#39;{
-                             key}&#39; in requested resources: {e}&#34;)
+        raise AttributeError(
+            f&#34;Missing required attribute &#39;{key}&#39; in requested resources: {e}&#34;)
     except Exception as e:
         raise Exception(f&#34;Error calculating resource differences: {e}&#34;)</code></pre>
 </details>

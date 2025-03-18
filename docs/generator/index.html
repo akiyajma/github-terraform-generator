@@ -40,6 +40,10 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="github-terraform-generator.generator.membership_generator" href="membership_generator.html">github-terraform-generator.generator.membership_generator</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="github-terraform-generator.generator.repository_generator" href="repository_generator.html">github-terraform-generator.generator.repository_generator</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -314,7 +318,7 @@ as needed.</li>
 <dl>
 <dt id="github-terraform-generator.generator.TerraformGenerator"><code class="flex name class">
 <span>class <span class="ident">TerraformGenerator</span></span>
-<span>(</span><span>template_dir: str, output_dir: str)</span>
+<span>(</span><span>template_dir, output_dir)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -322,173 +326,41 @@ as needed.</li>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TerraformGenerator:
-    &#34;&#34;&#34;
-    A utility class for generating Terraform configuration files for GitHub repositories and teams.
-
-    This class encapsulates the logic for handling repository and team data, validating inputs,
-    and generating Terraform configuration files by rendering Jinja2 templates.
-
-    Attributes:
-        template_dir (str): The directory containing the Jinja2 templates.
-        output_dir (str): The directory where the generated Terraform files will be saved.
-
-    Example:
-        &gt;&gt;&gt; generator = TerraformGenerator(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;)
-        &gt;&gt;&gt; generator.generate_repository({&#34;repository_name&#34;: &#34;repo1&#34;, &#34;visibility&#34;: &#34;public&#34;, &#34;gitignore_template&#34;: &#34;Python&#34;})
-        &gt;&gt;&gt; generator.generate_team({&#34;team_name&#34;: &#34;team1&#34;, &#34;privacy&#34;: &#34;closed&#34;})
-    &#34;&#34;&#34;
-
-    def __init__(self, template_dir: str, output_dir: str):
-        &#34;&#34;&#34;
-        Initialize the TerraformGenerator.
-
-        Args:
-            template_dir (str): Path to the directory containing Jinja2 templates.
-            output_dir (str): Path to the directory where Terraform files will be generated.
-
-        Example:
-            &gt;&gt;&gt; generator = TerraformGenerator(template_dir=&#34;templates&#34;, output_dir=&#34;output&#34;)
-        &#34;&#34;&#34;
+    def __init__(self, template_dir, output_dir):
         self.template_dir = template_dir
         self.output_dir = output_dir
 
     def generate_repository(self, repository):
-        &#34;&#34;&#34;
-        Generate Terraform configuration files for GitHub repositories.
-
-        This method generates Terraform configuration files for one or multiple GitHub repositories.
-        Each repository&#39;s configuration is rendered using a Jinja2 template and saved to the specified
-        output directory. If `gitignore_template` is explicitly set to `&#34;None&#34;`, it will be excluded
-        from the rendered Terraform configuration.
-
-        Args:
-            repository (Repository or dict or list[dict]): Repository data provided as:
-                - A single `Repository` object.
-                - A dictionary with the following attributes:
-                    - `repository_name` (str): The name of the repository (required).
-                    - `visibility` (str): The repository&#39;s visibility (e.g., &#34;public&#34;, &#34;private&#34;, &#34;internal&#34;) (required).
-                    - `description` (str, optional): A brief description of the repository. Defaults to `None` if not specified.
-                    - `gitignore_template` (str, optional): Specifies a `.gitignore` template to apply. If `&#34;None&#34;`, this attribute is excluded.
-                - A list of dictionaries or `Repository` objects.
-
-        Raises:
-            ValueError: If the repository data is missing required attributes or contains invalid values.
-            Exception: If any error occurs during template rendering or file generation.
-
-        Example:
-            Generate a single repository configuration:
-            &gt;&gt;&gt; generator = TerraformGenerator(&#34;templates&#34;, &#34;output&#34;)
-            &gt;&gt;&gt; generator.generate_repository({
-                &#34;repository_name&#34;: &#34;repo1&#34;,
-                &#34;visibility&#34;: &#34;public&#34;,
-                &#34;description&#34;: &#34;A public repository&#34;,
-                &#34;gitignore_template&#34;: &#34;Python&#34;
-            })
-
-            Generate multiple repository configurations:
-            &gt;&gt;&gt; generator.generate_repository([
-                {
-                    &#34;repository_name&#34;: &#34;repo2&#34;,
-                    &#34;visibility&#34;: &#34;private&#34;,
-                    &#34;description&#34;: &#34;A private repository&#34;,
-                    &#34;gitignore_template&#34;: &#34;Go&#34;
-                },
-                {
-                    &#34;repository_name&#34;: &#34;repo3&#34;,
-                    &#34;visibility&#34;: &#34;public&#34;,
-                    &#34;description&#34;: &#34;Another public repository&#34;,
-                    &#34;gitignore_template&#34;: &#34;None&#34;
-                }
-            ])
-
-        Notes:
-            - If `description` is not provided, a default value (e.g., from `config.yaml`) will be applied.
-            - If `gitignore_template` is `&#34;None&#34;`, the key is omitted in the generated Terraform file.
-            - The output file for each repository is named `&lt;repository_name&gt;_repository.tf` and saved in the `output_dir`.
-        &#34;&#34;&#34;
-        try:
-            if isinstance(repository, list):
-                for repo in repository:
-                    self.generate_repository(repo)
-                return
-
-            # Validate and convert repository data
-            if isinstance(repository, dict):
-                repository = Repository(**repository)
-
-            # Generate the Terraform file
-            generate_repository(repository, self.template_dir, self.output_dir)
-        except Exception as e:
-            repo_name = getattr(repository, &#34;repository_name&#34;, &#34;unknown&#34;) if not isinstance(
-                repository, list) else &#34;list&#34;
-            raise Exception(f&#34;Error generating Terraform file for repository &#39;{
-                            repo_name}&#39;. {e}&#34;) from e
+        # Logic to generate Terraform file for a repository
+        tf_file_path = os.path.join(
+            self.output_dir, f&#34;{repository[&#39;repository_name&#39;]}_repository.tf&#34;)
+        with open(tf_file_path, &#39;w&#39;) as tf_file:
+            tf_file.write(f&#34;&#34;&#34;
+resource &#34;github_repository&#34; &#34;{repository[&#39;repository_name&#39;]}&#34; {{
+  name        = &#34;{repository[&#39;repository_name&#39;]}&#34;
+  description = &#34;{repository[&#39;description&#39;]}&#34;
+  visibility  = &#34;{repository[&#39;visibility&#39;]}&#34;
+  gitignore_template = &#34;{repository[&#39;gitignore_template&#39;] if repository[&#39;gitignore_template&#39;] != &#39;None&#39; else &#39;&#39;}&#34;
+}}
+&#34;&#34;&#34;)
+        logger.info(f&#34;Generated Terraform file for repository: {tf_file_path}&#34;)
 
     def generate_team(self, team):
-        &#34;&#34;&#34;
-        Generate Terraform configuration files for GitHub teams.
-
-        Args:
-            team (Team or dict): A single team object or dictionary containing attributes:
-                - `team_name` (str): The name of the team.
-                - `description` (str, optional): A description of the team.
-                - `privacy` (str): The privacy setting of the team (e.g., &#34;closed&#34;, &#34;secret&#34;).
-                - `members` (list[dict], optional): A list of members where each member
-                  is represented as a dictionary with `username` and `role` keys.
-
-        Raises:
-            ValueError: If the team data is invalid or missing required attributes.
-            RuntimeError: If an error occurs during file generation.
-
-        Example:
-            &gt;&gt;&gt; generator = TerraformGenerator(&#34;templates&#34;, &#34;output&#34;)
-            &gt;&gt;&gt; generator.generate_team({
-                &#34;team_name&#34;: &#34;dev-team&#34;,
-                &#34;privacy&#34;: &#34;closed&#34;,
-                &#34;description&#34;: &#34;Development team&#34;,
-                &#34;members&#34;: [{&#34;username&#34;: &#34;user1&#34;, &#34;role&#34;: &#34;maintainer&#34;}]
-            })
-        &#34;&#34;&#34;
-        try:
-            # Validate and convert team data
-            if isinstance(team, dict):
-                team = Team(**team)
-        except Exception as e:
-            raise ValueError(f&#34;Invalid team data: {team}. {e}&#34;)
-
-        try:
-            # Generate the Terraform file
-            generate_team(team, self.template_dir, self.output_dir)
-        except Exception as e:
-            raise RuntimeError(f&#34;Failed to generate team Terraform file: {
-                               team.team_name}. {e}&#34;)</code></pre>
+        # Logic to generate Terraform file for a team
+        tf_file_path = os.path.join(
+            self.output_dir, f&#34;{team[&#39;team_name&#39;]}_team.tf&#34;)
+        with open(tf_file_path, &#39;w&#39;) as tf_file:
+            tf_file.write(f&#34;&#34;&#34;
+resource &#34;github_team&#34; &#34;{team[&#39;team_name&#39;]}&#34; {{
+  name        = &#34;{team[&#39;team_name&#39;]}&#34;
+  description = &#34;{team[&#39;description&#39;]}&#34;
+  privacy     = &#34;{team[&#39;privacy&#39;]}&#34;
+}}
+&#34;&#34;&#34;)
+        logger.info(f&#34;Generated Terraform file for team: {tf_file_path}&#34;)
+        logger.debug(f&#34;Generating team: {team[&#39;team_name&#39;]}&#34;)</code></pre>
 </details>
-<div class="desc"><p>A utility class for generating Terraform configuration files for GitHub repositories and teams.</p>
-<p>This class encapsulates the logic for handling repository and team data, validating inputs,
-and generating Terraform configuration files by rendering Jinja2 templates.</p>
-<h2 id="attributes">Attributes</h2>
-<dl>
-<dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>The directory containing the Jinja2 templates.</dd>
-<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>The directory where the generated Terraform files will be saved.</dd>
-</dl>
-<h2 id="example">Example</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; generator = TerraformGenerator(template_dir=&quot;templates&quot;, output_dir=&quot;output&quot;)
-&gt;&gt;&gt; generator.generate_repository({&quot;repository_name&quot;: &quot;repo1&quot;, &quot;visibility&quot;: &quot;public&quot;, &quot;gitignore_template&quot;: &quot;Python&quot;})
-&gt;&gt;&gt; generator.generate_team({&quot;team_name&quot;: &quot;team1&quot;, &quot;privacy&quot;: &quot;closed&quot;})
-</code></pre>
-<p>Initialize the TerraformGenerator.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>Path to the directory containing Jinja2 templates.</dd>
-<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
-<dd>Path to the directory where Terraform files will be generated.</dd>
-</dl>
-<h2 id="example_1">Example</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; generator = TerraformGenerator(template_dir=&quot;templates&quot;, output_dir=&quot;output&quot;)
-</code></pre></div>
+<div class="desc"></div>
 <h3>Methods</h3>
 <dl>
 <dt id="github-terraform-generator.generator.TerraformGenerator.generate_repository"><code class="name flex">
@@ -499,134 +371,22 @@ and generating Terraform configuration files by rendering Jinja2 templates.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_repository(self, repository):
-    &#34;&#34;&#34;
-    Generate Terraform configuration files for GitHub repositories.
-
-    This method generates Terraform configuration files for one or multiple GitHub repositories.
-    Each repository&#39;s configuration is rendered using a Jinja2 template and saved to the specified
-    output directory. If `gitignore_template` is explicitly set to `&#34;None&#34;`, it will be excluded
-    from the rendered Terraform configuration.
-
-    Args:
-        repository (Repository or dict or list[dict]): Repository data provided as:
-            - A single `Repository` object.
-            - A dictionary with the following attributes:
-                - `repository_name` (str): The name of the repository (required).
-                - `visibility` (str): The repository&#39;s visibility (e.g., &#34;public&#34;, &#34;private&#34;, &#34;internal&#34;) (required).
-                - `description` (str, optional): A brief description of the repository. Defaults to `None` if not specified.
-                - `gitignore_template` (str, optional): Specifies a `.gitignore` template to apply. If `&#34;None&#34;`, this attribute is excluded.
-            - A list of dictionaries or `Repository` objects.
-
-    Raises:
-        ValueError: If the repository data is missing required attributes or contains invalid values.
-        Exception: If any error occurs during template rendering or file generation.
-
-    Example:
-        Generate a single repository configuration:
-        &gt;&gt;&gt; generator = TerraformGenerator(&#34;templates&#34;, &#34;output&#34;)
-        &gt;&gt;&gt; generator.generate_repository({
-            &#34;repository_name&#34;: &#34;repo1&#34;,
-            &#34;visibility&#34;: &#34;public&#34;,
-            &#34;description&#34;: &#34;A public repository&#34;,
-            &#34;gitignore_template&#34;: &#34;Python&#34;
-        })
-
-        Generate multiple repository configurations:
-        &gt;&gt;&gt; generator.generate_repository([
-            {
-                &#34;repository_name&#34;: &#34;repo2&#34;,
-                &#34;visibility&#34;: &#34;private&#34;,
-                &#34;description&#34;: &#34;A private repository&#34;,
-                &#34;gitignore_template&#34;: &#34;Go&#34;
-            },
-            {
-                &#34;repository_name&#34;: &#34;repo3&#34;,
-                &#34;visibility&#34;: &#34;public&#34;,
-                &#34;description&#34;: &#34;Another public repository&#34;,
-                &#34;gitignore_template&#34;: &#34;None&#34;
-            }
-        ])
-
-    Notes:
-        - If `description` is not provided, a default value (e.g., from `config.yaml`) will be applied.
-        - If `gitignore_template` is `&#34;None&#34;`, the key is omitted in the generated Terraform file.
-        - The output file for each repository is named `&lt;repository_name&gt;_repository.tf` and saved in the `output_dir`.
-    &#34;&#34;&#34;
-    try:
-        if isinstance(repository, list):
-            for repo in repository:
-                self.generate_repository(repo)
-            return
-
-        # Validate and convert repository data
-        if isinstance(repository, dict):
-            repository = Repository(**repository)
-
-        # Generate the Terraform file
-        generate_repository(repository, self.template_dir, self.output_dir)
-    except Exception as e:
-        repo_name = getattr(repository, &#34;repository_name&#34;, &#34;unknown&#34;) if not isinstance(
-            repository, list) else &#34;list&#34;
-        raise Exception(f&#34;Error generating Terraform file for repository &#39;{
-                        repo_name}&#39;. {e}&#34;) from e</code></pre>
+<pre><code class="python">    def generate_repository(self, repository):
+        # Logic to generate Terraform file for a repository
+        tf_file_path = os.path.join(
+            self.output_dir, f&#34;{repository[&#39;repository_name&#39;]}_repository.tf&#34;)
+        with open(tf_file_path, &#39;w&#39;) as tf_file:
+            tf_file.write(f&#34;&#34;&#34;
+resource &#34;github_repository&#34; &#34;{repository[&#39;repository_name&#39;]}&#34; {{
+  name        = &#34;{repository[&#39;repository_name&#39;]}&#34;
+  description = &#34;{repository[&#39;description&#39;]}&#34;
+  visibility  = &#34;{repository[&#39;visibility&#39;]}&#34;
+  gitignore_template = &#34;{repository[&#39;gitignore_template&#39;] if repository[&#39;gitignore_template&#39;] != &#39;None&#39; else &#39;&#39;}&#34;
+}}
+&#34;&#34;&#34;)
+        logger.info(f&#34;Generated Terraform file for repository: {tf_file_path}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Generate Terraform configuration files for GitHub repositories.</p>
-<p>This method generates Terraform configuration files for one or multiple GitHub repositories.
-Each repository's configuration is rendered using a Jinja2 template and saved to the specified
-output directory. If <code>gitignore_template</code> is explicitly set to <code>"None"</code>, it will be excluded
-from the rendered Terraform configuration.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>repository</code></strong> :&ensp;<code>Repository</code> or <code>dict</code> or <code>list[dict]</code></dt>
-<dd>Repository data provided as:
-- A single <code>Repository</code> object.
-- A dictionary with the following attributes:
-- <code>repository_name</code> (str): The name of the repository (required).
-- <code>visibility</code> (str): The repository's visibility (e.g., "public", "private", "internal") (required).
-- <code>description</code> (str, optional): A brief description of the repository. Defaults to <code>None</code> if not specified.
-- <code>gitignore_template</code> (str, optional): Specifies a <code>.gitignore</code> template to apply. If <code>"None"</code>, this attribute is excluded.
-- A list of dictionaries or <code>Repository</code> objects.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>ValueError</code></dt>
-<dd>If the repository data is missing required attributes or contains invalid values.</dd>
-<dt><code>Exception</code></dt>
-<dd>If any error occurs during template rendering or file generation.</dd>
-</dl>
-<h2 id="example">Example</h2>
-<p>Generate a single repository configuration:</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; generator = TerraformGenerator(&quot;templates&quot;, &quot;output&quot;)
-&gt;&gt;&gt; generator.generate_repository({
-    &quot;repository_name&quot;: &quot;repo1&quot;,
-    &quot;visibility&quot;: &quot;public&quot;,
-    &quot;description&quot;: &quot;A public repository&quot;,
-    &quot;gitignore_template&quot;: &quot;Python&quot;
-})
-</code></pre>
-<p>Generate multiple repository configurations:</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; generator.generate_repository([
-    {
-        &quot;repository_name&quot;: &quot;repo2&quot;,
-        &quot;visibility&quot;: &quot;private&quot;,
-        &quot;description&quot;: &quot;A private repository&quot;,
-        &quot;gitignore_template&quot;: &quot;Go&quot;
-    },
-    {
-        &quot;repository_name&quot;: &quot;repo3&quot;,
-        &quot;visibility&quot;: &quot;public&quot;,
-        &quot;description&quot;: &quot;Another public repository&quot;,
-        &quot;gitignore_template&quot;: &quot;None&quot;
-    }
-])
-</code></pre>
-<h2 id="notes">Notes</h2>
-<ul>
-<li>If <code>description</code> is not provided, a default value (e.g., from <code>config.yaml</code>) will be applied.</li>
-<li>If <code>gitignore_template</code> is <code>"None"</code>, the key is omitted in the generated Terraform file.</li>
-<li>The output file for each repository is named <code>&lt;repository_name&gt;_repository.tf</code> and saved in the <code>output_dir</code>.</li>
-</ul></div>
+<div class="desc"></div>
 </dd>
 <dt id="github-terraform-generator.generator.TerraformGenerator.generate_team"><code class="name flex">
 <span>def <span class="ident">generate_team</span></span>(<span>self, team)</span>
@@ -636,72 +396,22 @@ from the rendered Terraform configuration.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_team(self, team):
-    &#34;&#34;&#34;
-    Generate Terraform configuration files for GitHub teams.
-
-    Args:
-        team (Team or dict): A single team object or dictionary containing attributes:
-            - `team_name` (str): The name of the team.
-            - `description` (str, optional): A description of the team.
-            - `privacy` (str): The privacy setting of the team (e.g., &#34;closed&#34;, &#34;secret&#34;).
-            - `members` (list[dict], optional): A list of members where each member
-              is represented as a dictionary with `username` and `role` keys.
-
-    Raises:
-        ValueError: If the team data is invalid or missing required attributes.
-        RuntimeError: If an error occurs during file generation.
-
-    Example:
-        &gt;&gt;&gt; generator = TerraformGenerator(&#34;templates&#34;, &#34;output&#34;)
-        &gt;&gt;&gt; generator.generate_team({
-            &#34;team_name&#34;: &#34;dev-team&#34;,
-            &#34;privacy&#34;: &#34;closed&#34;,
-            &#34;description&#34;: &#34;Development team&#34;,
-            &#34;members&#34;: [{&#34;username&#34;: &#34;user1&#34;, &#34;role&#34;: &#34;maintainer&#34;}]
-        })
-    &#34;&#34;&#34;
-    try:
-        # Validate and convert team data
-        if isinstance(team, dict):
-            team = Team(**team)
-    except Exception as e:
-        raise ValueError(f&#34;Invalid team data: {team}. {e}&#34;)
-
-    try:
-        # Generate the Terraform file
-        generate_team(team, self.template_dir, self.output_dir)
-    except Exception as e:
-        raise RuntimeError(f&#34;Failed to generate team Terraform file: {
-                           team.team_name}. {e}&#34;)</code></pre>
+<pre><code class="python">    def generate_team(self, team):
+        # Logic to generate Terraform file for a team
+        tf_file_path = os.path.join(
+            self.output_dir, f&#34;{team[&#39;team_name&#39;]}_team.tf&#34;)
+        with open(tf_file_path, &#39;w&#39;) as tf_file:
+            tf_file.write(f&#34;&#34;&#34;
+resource &#34;github_team&#34; &#34;{team[&#39;team_name&#39;]}&#34; {{
+  name        = &#34;{team[&#39;team_name&#39;]}&#34;
+  description = &#34;{team[&#39;description&#39;]}&#34;
+  privacy     = &#34;{team[&#39;privacy&#39;]}&#34;
+}}
+&#34;&#34;&#34;)
+        logger.info(f&#34;Generated Terraform file for team: {tf_file_path}&#34;)
+        logger.debug(f&#34;Generating team: {team[&#39;team_name&#39;]}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Generate Terraform configuration files for GitHub teams.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>team</code></strong> :&ensp;<code>Team</code> or <code>dict</code></dt>
-<dd>A single team object or dictionary containing attributes:
-- <code>team_name</code> (str): The name of the team.
-- <code>description</code> (str, optional): A description of the team.
-- <code>privacy</code> (str): The privacy setting of the team (e.g., "closed", "secret").
-- <code>members</code> (list[dict], optional): A list of members where each member
-is represented as a dictionary with <code>username</code> and <code>role</code> keys.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>ValueError</code></dt>
-<dd>If the team data is invalid or missing required attributes.</dd>
-<dt><code>RuntimeError</code></dt>
-<dd>If an error occurs during file generation.</dd>
-</dl>
-<h2 id="example">Example</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; generator = TerraformGenerator(&quot;templates&quot;, &quot;output&quot;)
-&gt;&gt;&gt; generator.generate_team({
-    &quot;team_name&quot;: &quot;dev-team&quot;,
-    &quot;privacy&quot;: &quot;closed&quot;,
-    &quot;description&quot;: &quot;Development team&quot;,
-    &quot;members&quot;: [{&quot;username&quot;: &quot;user1&quot;, &quot;role&quot;: &quot;maintainer&quot;}]
-})
-</code></pre></div>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
@@ -720,6 +430,7 @@ is represented as a dictionary with <code>username</code> and <code>role</code> 
 </li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="github-terraform-generator.generator.membership_generator" href="membership_generator.html">github-terraform-generator.generator.membership_generator</a></code></li>
 <li><code><a title="github-terraform-generator.generator.repository_generator" href="repository_generator.html">github-terraform-generator.generator.repository_generator</a></code></li>
 <li><code><a title="github-terraform-generator.generator.team_generator" href="team_generator.html">github-terraform-generator.generator.team_generator</a></code></li>
 <li><code><a title="github-terraform-generator.generator.terraform_generator" href="terraform_generator.html">github-terraform-generator.generator.terraform_generator</a></code></li>

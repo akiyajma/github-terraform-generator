@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>github-terraform-generator.tests API documentation</title>
+<title>github-terraform-generator.generator.membership_generator API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,54 +33,62 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>github-terraform-generator.tests</code></h1>
+<h1 class="title">Module <code>github-terraform-generator.generator.membership_generator</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_config_loader" href="test_config_loader.html">github-terraform-generator.tests.test_config_loader</a></code></dt>
+<dt id="github-terraform-generator.generator.membership_generator.generate_membership"><code class="name flex">
+<span>def <span class="ident">generate_membership</span></span>(<span>membership, template_dir, output_dir, action='create')</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_diff_calculator" href="test_diff_calculator.html">github-terraform-generator.tests.test_diff_calculator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_generator" href="test_generator.html">github-terraform-generator.tests.test_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_main" href="test_main.html">github-terraform-generator.tests.test_main</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_membership_generator" href="test_membership_generator.html">github-terraform-generator.tests.test_membership_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_models" href="test_models.html">github-terraform-generator.tests.test_models</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_repository_generator" href="test_repository_generator.html">github-terraform-generator.tests.test_repository_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_team_generator" href="test_team_generator.html">github-terraform-generator.tests.test_team_generator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="github-terraform-generator.tests.test_tfstate_loader" href="test_tfstate_loader.html">github-terraform-generator.tests.test_tfstate_loader</a></code></dt>
-<dd>
-<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_membership(membership, template_dir, output_dir, action=&#34;create&#34;):
+    &#34;&#34;&#34;
+    Generate a Terraform configuration file for GitHub membership with support for create, update, and delete actions.
+
+    Args:
+        membership (Membership): The membership object containing username.
+        template_dir (str): Path to the Jinja2 template directory.
+        output_dir (str): Path to the output directory.
+
+    Returns:
+        None
+    &#34;&#34;&#34;
+    if action not in [&#34;create&#34;, &#34;update&#34;, &#34;delete&#34;]:
+        raise ValueError(
+            &#34;Invalid action. Must be &#39;create&#39;, &#39;update&#39;, or &#39;delete&#39;.&#34;)
+
+    env = Environment(loader=FileSystemLoader(template_dir))
+    template = env.get_template(&#34;membership.tf.j2&#34;)
+
+    output_path = f&#34;{output_dir}/{membership.username}_membership.tf&#34;
+    with open(output_path, &#34;w&#34;) as file:
+        file.write(template.render(membership=membership, action=action))</code></pre>
+</details>
+<div class="desc"><p>Generate a Terraform configuration file for GitHub membership with support for create, update, and delete actions.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>membership</code></strong> :&ensp;<code>Membership</code></dt>
+<dd>The membership object containing username.</dd>
+<dt><strong><code>template_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the Jinja2 template directory.</dd>
+<dt><strong><code>output_dir</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the output directory.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -92,20 +100,12 @@ el.replaceWith(d);
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="github-terraform-generator" href="../index.html">github-terraform-generator</a></code></li>
+<li><code><a title="github-terraform-generator.generator" href="index.html">github-terraform-generator.generator</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="github-terraform-generator.tests.test_config_loader" href="test_config_loader.html">github-terraform-generator.tests.test_config_loader</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_diff_calculator" href="test_diff_calculator.html">github-terraform-generator.tests.test_diff_calculator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_generator" href="test_generator.html">github-terraform-generator.tests.test_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_main" href="test_main.html">github-terraform-generator.tests.test_main</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_membership_generator" href="test_membership_generator.html">github-terraform-generator.tests.test_membership_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_models" href="test_models.html">github-terraform-generator.tests.test_models</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_repository_generator" href="test_repository_generator.html">github-terraform-generator.tests.test_repository_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_team_generator" href="test_team_generator.html">github-terraform-generator.tests.test_team_generator</a></code></li>
-<li><code><a title="github-terraform-generator.tests.test_tfstate_loader" href="test_tfstate_loader.html">github-terraform-generator.tests.test_tfstate_loader</a></code></li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="github-terraform-generator.generator.membership_generator.generate_membership" href="#github-terraform-generator.generator.membership_generator.generate_membership">generate_membership</a></code></li>
 </ul>
 </li>
 </ul>
