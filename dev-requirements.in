@@ -6,3 +6,4 @@ pytest
 gitdb
 gitpython
 pdoc3
+pytest-cov

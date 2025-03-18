@@ -6,6 +6,7 @@ from loguru import logger
 
 from config.config_loader import load_config
 from logging_config import setup_logging
+from models.membership import Membership
 from models.repository import Repository
 from models.team import Team
 from utils.diff_calculator import calculate_diff
@@ -25,7 +26,7 @@ def main(output_dir_override=None):
     It performs the following steps:
     1. Loads the application configuration from `config.yaml`.
     2. Loads the existing Terraform state from the specified file.
-    3. Extracts resources (repositories and teams) from the Terraform state.
+    3. Extracts resources (repositories, teams, and memberships) from the Terraform state.
     4. Compares the extracted resources with the new resources provided via environment variables,
        applying default values from `config.yaml` where applicable.
     5. Calculates the differences (additions, updates, deletions) between the existing and new resources.
@@ -47,6 +48,8 @@ def main(output_dir_override=None):
             - `description` (str, optional): A description of the team.
             - `privacy` (str): The privacy level of the team (e.g., "closed" or "secret").
             - `members` (list[dict], optional): A list of team members with their roles.
+        MEMBERSHIPS (str): A JSON-encoded list of GitHub usernames for organization membership.
+            - Each username is assigned the role "member".
 
     Configuration:
         The application configuration (`config.yaml`) includes:
@@ -89,36 +92,56 @@ def main(output_dir_override=None):
         existing_state = extract_resources(tfstate)
         save_existing_state(existing_state, state_file)
 
-        # Load new resources
+        # Load new resources from environment variables
         repositories_json = os.getenv("REPOSITORIES", "[]")
         teams_json = os.getenv("TEAMS", "[]")
+        memberships_json = os.getenv("MEMBERSHIPS", "[]")
 
         default_repo_config = config["default_repository"]
         default_team_config = config["default_team"]
 
+        # Parse JSON and apply default values
         new_repositories = [
-            Repository(
-                **{**default_repo_config, **repo}
-            ) for repo in json.loads(repositories_json)
+            Repository(**{**default_repo_config, **repo})
+            for repo in json.loads(repositories_json)
         ]
         new_teams = [
-            Team(
-                **{**default_team_config, **team}
-            ) for team in json.loads(teams_json)
+            Team(**{**default_team_config, **team})
+            for team in json.loads(teams_json)
         ]
 
-        # Calculate differences
+        # --- Memberships Handling ---
+        # Ensure existing memberships is a valid list
+        existing_memberships = existing_state.get("memberships", [])
+        if not isinstance(existing_memberships, list):
+            existing_memberships = []
+
+        # Ensure all elements in existing_memberships are dictionaries
+        existing_memberships = [
+            m for m in existing_memberships if isinstance(m, dict)]
+
+        # Convert new memberships from environment variable
+        new_memberships = [Membership(username=membership)
+                           for membership in json.loads(memberships_json)]
+        new_memberships_dicts = [membership.to_dict()
+                                 for membership in new_memberships]
+
+        # Calculate differences for repositories, teams, and memberships
         repos_to_add, repos_to_update, repos_to_delete = calculate_diff(
-            existing_state["repositories"], new_repositories, key="repository_name"
+            existing_state.get("repositories", []), new_repositories, key="repository_name"
         )
         teams_to_add, teams_to_update, teams_to_delete = calculate_diff(
-            existing_state["teams"], new_teams, key="team_name"
+            existing_state.get("teams", []), new_teams, key="team_name"
+        )
+        memberships_to_add, memberships_to_update, memberships_to_delete = calculate_diff(
+            existing_memberships, new_memberships_dicts, key="username"
         )
 
-        # Process resources
+        # Process resources including memberships with full lifecycle (add/update/delete)
         resource_changes = ResourceChanges(
             repos_to_add, repos_to_update, repos_to_delete,
-            teams_to_add, teams_to_update, teams_to_delete
+            teams_to_add, teams_to_update, teams_to_delete,
+            memberships_to_add, memberships_to_update, memberships_to_delete
         )
         process_resources(config["template_dir"], output_dir, resource_changes)
 

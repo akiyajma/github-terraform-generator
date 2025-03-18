@@ -10,6 +10,8 @@ black==24.10.0
     # via -r dev-requirements.in
 click==8.1.8
     # via black
+coverage[toml]==7.7.0
+    # via pytest-cov
 flake8==7.1.1
     # via -r dev-requirements.in
 gitdb==4.0.12
@@ -59,6 +61,10 @@ pydantic-core==2.27.2
 pyflakes==3.2.0
     # via flake8
 pytest==8.3.4
+    # via
+    #   -r dev-requirements.in
+    #   pytest-cov
+pytest-cov==6.0.0
     # via -r dev-requirements.in
 pyyaml==6.0.2
     # via -r /workspaces/github-terraform-generator/requirements.in

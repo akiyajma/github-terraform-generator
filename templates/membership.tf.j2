@@ -1,0 +1,8 @@
+{% if action == "create" or action == "update" %}
+resource "github_membership" "{{ membership.username }}" {
+  username = "{{ membership.username }}"
+  role     = "{{ membership.role }}"
+}
+{% elif action == "delete" %}
+# Deleting membership for {{ membership.username }}
+{% endif %}

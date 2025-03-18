@@ -147,50 +147,84 @@ def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to
         raise Exception(f"Unexpected error processing teams: {e}")
 
 
+def process_memberships(generator, output_dir, memberships_to_add, memberships_to_update, memberships_to_delete):
+    """
+    Handle membership lifecycle: addition, update, and deletion.
+    """
+    # Process additions
+    for membership in memberships_to_add:
+        try:
+            generator.generate_membership(membership, action="create")
+        except Exception as e:
+            raise Exception(
+                f"Error adding membership for '{membership.get('username', 'unknown')}': {e}")
+
+    # Process updates
+    for membership in memberships_to_update:
+        try:
+            generator.generate_membership(membership, action="update")
+        except Exception as e:
+            raise Exception(
+                f"Error updating membership for '{membership.get('username', 'unknown')}': {e}")
+
+    # Process deletions
+    for membership in memberships_to_delete:
+        try:
+            tf_file = os.path.join(
+                output_dir, f"{membership['username']}_membership.tf")
+            if os.path.exists(tf_file):
+                os.remove(tf_file)
+                logger.info(f"Deleted Terraform file: {tf_file}")
+            else:
+                logger.warning(
+                    f"Terraform file not found for deletion: {tf_file}")
+        except Exception as e:
+            raise Exception(
+                f"Error deleting membership for '{membership.get('username', 'unknown')}': {e}")
+
+
 def process_resources(template_dir, output_dir, resource_changes: ResourceChanges):
     """
-    Orchestrate the processing of repositories and teams for addition, update, and deletion.
-
-    This function delegates repository and team operations to the respective helper functions.
+    Orchestrate the processing of repositories, teams, and memberships for addition, update, and deletion.
 
     Args:
         template_dir (str): The directory containing Jinja2 templates for Terraform files.
         output_dir (str): The directory where Terraform files will be generated or deleted.
-        resource_changes (ResourceChanges): An object containing changes to repositories and teams.
+        resource_changes (ResourceChanges): An object containing changes to repositories, teams, and memberships.
 
     Raises:
-        Exception: If an error occurs during repository or team processing.
+        Exception: If an error occurs during processing.
 
     Example:
         resource_changes = ResourceChanges(
-            repos_to_add=[{"repository_name": "repo1", "visibility": "public", "description": "New repo", "gitignore_template": "Python"}],
-            repos_to_update=[{"repository_name": "repo2", "visibility": "private", "description": "Updated repo", "gitignore_template": "None"}],
-            repos_to_delete=[{"repository_name": "repo3"}],
-            teams_to_add=[{"team_name": "team1", "privacy": "closed", "description": "New team", "members": [{"username": "user1", "role": "maintainer"}]}],
-            teams_to_update=[],
-            teams_to_delete=[{"team_name": "team2"}]
+            repos_to_add=[{"repository_name": "repo1", "visibility": "public"}],
+            teams_to_add=[{"team_name": "team1", "privacy": "closed"}],
+            memberships_to_add=[{"username": "user1"}]
         )
         process_resources(template_dir="templates", output_dir="output", resource_changes=resource_changes)
     """
     try:
         generator = TerraformGenerator(template_dir, output_dir)
 
-        # Delegate repository processing
         process_repositories(
-            generator,
-            output_dir,
+            generator, output_dir,
             resource_changes.repos_to_add,
             resource_changes.repos_to_update,
             resource_changes.repos_to_delete,
         )
 
-        # Delegate team processing
         process_teams(
-            generator,
-            output_dir,
+            generator, output_dir,
             resource_changes.teams_to_add,
             resource_changes.teams_to_update,
             resource_changes.teams_to_delete,
+        )
+
+        process_memberships(
+            generator, output_dir,
+            resource_changes.memberships_to_add,
+            resource_changes.memberships_to_update,
+            resource_changes.memberships_to_delete
         )
 
         logger.info("Resource processing completed successfully.")

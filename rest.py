@@ -11,13 +11,15 @@ config_path = os.path.join(BASE_DIR, "config/config.yaml")
 if not os.path.exists(config_path):
     # config.yaml を生成
     with open(config_path, "w") as f:
-        f.write("""
+        f.write("""\
 template_dir: "templates"
 output_dir: "terraform"
 default_repository:
   visibility: "public"
 default_team:
   privacy: "closed"
+  role: "member"
+default_membership:
   role: "member"
 """)
 
@@ -51,6 +53,13 @@ os.environ["TEAMS"] = json.dumps([
         "privacy": "closed",
         "members": [{"username": "user1", "role": "maintainer"}]
     }
+])
+
+# MEMBERSHIPS を追加（全員 "member" とする）
+os.environ["MEMBERSHIPS"] = json.dumps([
+    "user1",
+    "user2",
+    "user3"
 ])
 
 # 作業ディレクトリをプロジェクトルートに変更
