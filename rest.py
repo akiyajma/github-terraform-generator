@@ -57,9 +57,9 @@ os.environ["TEAMS"] = json.dumps([
 
 # MEMBERSHIPS を追加（全員 "member" とする）
 os.environ["MEMBERSHIPS"] = json.dumps([
-    "user1",
-    "user2",
-    "user3"
+    {"username": "user1", "role": "member"},
+    {"username": "user2", "role": "member"},
+    {"username": "user3", "role": "member"}
 ])
 
 # 作業ディレクトリをプロジェクトルートに変更
