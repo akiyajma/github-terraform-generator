@@ -21,5 +21,6 @@ def generate_membership(membership, template_dir, output_dir, action="create"):
     template = env.get_template("membership.tf.j2")
 
     output_path = f"{output_dir}/{membership.username}_membership.tf"
+
     with open(output_path, "w") as file:
         file.write(template.render(membership=membership, action=action))

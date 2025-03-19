@@ -1,8 +1,10 @@
 from models.membership import Membership
 from models.repository import Repository
+from models.repository_collaborator import RepositoryCollaborator
 from models.team import Team
 
 from .membership_generator import generate_membership
+from .repository_collaborator_generator import generate_repository_collaborator
 from .repository_generator import generate_repository
 from .team_generator import generate_team
 
@@ -170,3 +172,26 @@ class TerraformGenerator:
             username = getattr(membership, "username", "unknown")
             raise Exception(
                 f"Error generating Terraform file for membership '{username}': {e}") from e
+
+    def generate_repository_collaborator(self, repository_collaborator):
+        """
+        Generate Terraform configuration file for a GitHub repository collaborator.
+        """
+        try:
+            if isinstance(repository_collaborator, list):
+                for rc in repository_collaborator:
+                    self.generate_repository_collaborator(rc)
+                return
+
+            if isinstance(repository_collaborator, dict):
+                repository_collaborator = RepositoryCollaborator(
+                    **repository_collaborator)
+
+            generate_repository_collaborator(
+                repository_collaborator, self.template_dir, self.output_dir)
+        except Exception as e:
+            username = getattr(repository_collaborator, "username", "unknown")
+            repo = getattr(repository_collaborator,
+                           "repository_name", "unknown")
+            raise Exception(
+                f"Error generating Terraform file for repository collaborator '{username}' on repository '{repo}': {e}") from e

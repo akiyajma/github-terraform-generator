@@ -1,4 +1,4 @@
-resource "github_membership" "{{ username }}" {
-  username = "{{ username }}"
-  role     = "{{ role }}"
+resource "github_membership" "{{ membership.username }}" {
+  username = "{{ membership.username }}"
+  role     = "{{ membership.role }}"
 }

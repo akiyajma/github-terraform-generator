@@ -75,7 +75,7 @@ def load_tfstate(tfstate_file):
         raise FileNotFoundError(f"tfstate file not found: {e}")
     except json.JSONDecodeError as e:
         raise json.JSONDecodeError(
-            f"Invalid JSON format in {tfstate_file}: {e}")
+            f"Invalid JSON format in {tfstate_file}: {e}", e.doc, e.pos)
     except Exception as e:
         raise Exception(f"Unexpected error loading tfstate: {e}")
 
@@ -132,6 +132,7 @@ def extract_resources(tfstate):
         repositories = []
         teams = []
         memberships = []
+        repo_collaborators = []
 
         for resource in tfstate.get("resources", []):
             if resource["type"] == "github_repository":
@@ -159,8 +160,17 @@ def extract_resources(tfstate):
                         "username": attributes["username"],
                         "role": attributes["role"]
                     })
+            elif resource["type"] == "github_repository_collaborator":
+                for instance in resource.get("instances", []):
+                    attributes = instance.get("attributes", {})
+                    repo_collaborators.append({
+                        "repository_name": attributes["repository"],
+                        "username": attributes["username"],
+                        "permission": attributes["permission"],
+                        "collaborator_id": f"{attributes['repository']}_{attributes['username']}"
+                    })
 
-        return {"repositories": repositories, "teams": teams, "memberships": memberships}
+        return {"repositories": repositories, "teams": teams, "memberships": memberships, "repository_collaborators": repo_collaborators}
     except KeyError as e:
         raise KeyError(f"Missing expected key in tfstate: {e}")
     except Exception as e:

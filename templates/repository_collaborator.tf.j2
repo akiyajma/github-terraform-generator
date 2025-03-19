@@ -1,0 +1,5 @@
+resource "github_repository_collaborator" "{{ repository_collaborator.username }}" {
+  repository = "{{ repository_collaborator.repository_name }}"
+  username   = "{{ repository_collaborator.username }}"
+  permission = "{{ repository_collaborator.permission }}"
+}

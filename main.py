@@ -94,10 +94,13 @@ def main(output_dir_override=None):
         repositories_json = os.getenv("REPOSITORIES", "[]")
         teams_json = os.getenv("TEAMS", "[]")
         memberships_json = os.getenv("MEMBERSHIPS", "[]")
+        repo_collaborators_json = os.getenv("REPOSITORY_COLLABORATORS", "[]")
 
         default_repo_config = config["default_repository"]
         default_team_config = config["default_team"]
         default_membership_config = config.get("default_membership", {})
+        default_repo_collaborator_config = config.get(
+            "default_repository_collaborator", {})
 
         new_repositories = [
             Repository(
@@ -113,6 +116,12 @@ def main(output_dir_override=None):
             Membership(**{**default_membership_config, **membership})
             for membership in json.loads(memberships_json)
         ]
+        from models.repository_collaborator import RepositoryCollaborator
+        new_repo_collaborators = [
+            RepositoryCollaborator(
+                **{**default_repo_collaborator_config, **collab})
+            for collab in json.loads(repo_collaborators_json)
+        ]
         # Calculate differences
         repos_to_add, repos_to_update, repos_to_delete = calculate_diff(
             existing_state["repositories"], new_repositories, key="repository_name"
@@ -123,12 +132,16 @@ def main(output_dir_override=None):
         memberships_to_add, memberships_to_update, memberships_to_delete = calculate_diff(
             existing_state.get("memberships", []), new_memberships, key="username"
         )
+        repo_collaborators_to_add, repo_collaborators_to_update, repo_collaborators_to_delete = calculate_diff(
+            existing_state.get("repository_collaborators", []), new_repo_collaborators, key="collaborator_id"
+        )
 
         # Process resources
         resource_changes = ResourceChanges(
             repos_to_add, repos_to_update, repos_to_delete,
             teams_to_add, teams_to_update, teams_to_delete,
-            memberships_to_add, memberships_to_update, memberships_to_delete
+            memberships_to_add, memberships_to_update, memberships_to_delete,
+            repo_collaborators_to_add, repo_collaborators_to_update, repo_collaborators_to_delete
         )
         process_resources(config["template_dir"], output_dir, resource_changes)
 

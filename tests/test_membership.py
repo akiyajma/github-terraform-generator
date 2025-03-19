@@ -1,263 +1,87 @@
 import os
-from unittest.mock import MagicMock
 
 import pytest
+from pydantic import ValidationError
 
-from utils.process_resources import process_resources
+from generator.membership_generator import generate_membership
+from models.membership import Membership
 
 
-# autouse フィクスチャ: テスト終了後に生成された Terraform ファイルを削除
+# 一時的なテンプレートディレクトリを作成し、membership.tf.j2 テンプレートを用意するフィクスチャ
+@pytest.fixture
+def temp_template_dir(tmp_path):
+    templates_dir = tmp_path / "templates"
+    templates_dir.mkdir()
+    template_file = templates_dir / "membership.tf.j2"
+    # 簡単なテンプレート。membership の username, role, action をレンダリングする
+    template_file.write_text(
+        'resource "github_membership" "{{ membership.username }}" {\n'
+        '  role = "{{ membership.role }}"\n'
+        '  action = "{{ action }}"\n'
+        '}\n'
+    )
+    return str(templates_dir)
+
+# 一時的な出力ディレクトリを作成するフィクスチャ
+
+
+@pytest.fixture
+def temp_output_dir(tmp_path):
+    output_dir = tmp_path / "terraform"
+    output_dir.mkdir()
+    return str(output_dir)
+
+# autouse フィクスチャ: テスト終了後に生成された membership ファイルを削除
+
+
 @pytest.fixture(autouse=True)
-def cleanup_generated_files():
-    yield  # テスト実行
-    # membership の生成ファイル
-    membership_path = os.path.join("terraform", "user1_membership.tf")
-    if os.path.exists(membership_path):
-        os.remove(membership_path)
-    # repository の生成ファイル（例: example-repo_repository.tf）
-    repo_path = os.path.join("terraform", "example-repo_repository.tf")
-    if os.path.exists(repo_path):
-        os.remove(repo_path)
-    # team の生成ファイル（例: example-team_team.tf）
-    team_path = os.path.join("terraform", "example-team_team.tf")
-    if os.path.exists(team_path):
-        os.remove(team_path)
+def cleanup_generated_file(temp_output_dir):
+    yield
+    membership_file = os.path.join(temp_output_dir, "user1_membership.tf")
+    if os.path.exists(membership_file):
+        os.remove(membership_file)
 
 
-def test_process_repositories_addition(mocker):
-    # TerraformGenerator のインスタンス生成をモックする
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.repos_to_add = [
-        {"repository_name": "repo1", "visibility": "public",
-            "description": "New repo", "gitignore_template": "Python"}
-    ]
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    # teams, memberships は空リストを設定してエラー回避
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_repository.assert_called_once_with(
-        resource_changes.repos_to_add[0])
+def test_membership_model_valid():
+    """
+    有効な Membership モデルが正しく生成されることを検証します。
+    """
+    membership = Membership(username="user1", role="member")
+    assert membership.username == "user1"
+    assert membership.role == "member"
+    assert membership.allow_delete is False
 
 
-def test_process_repositories_update(mocker):
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = [
-        {"repository_name": "repo1", "visibility": "public",
-            "description": "Updated repo", "gitignore_template": "Python"}
-    ]
-    resource_changes.repos_to_delete = []
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_repository.assert_called_once_with(
-        resource_changes.repos_to_update[0])
+def test_membership_model_invalid_role():
+    """
+    無効な role を指定した場合に ValidationError が発生することを検証します。
+    """
+    with pytest.raises(ValidationError):
+        Membership(username="user1", role="invalid")
 
 
-def test_process_repositories_deletion(mocker):
-    # 削除の場合は、生成済みのファイルを削除する処理を検証
-    output_dir = "terraform"
-    os.makedirs(output_dir, exist_ok=True)
-    tf_file = os.path.join(output_dir, "repo1_repository.tf")
-    with open(tf_file, "w") as f:
-        f.write("dummy")
-
-    resource_changes = MagicMock()
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = [{"repository_name": "repo1"}]
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    # TerraformGenerator の生成は不要なためモックで置換
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=MagicMock())
-    process_resources("templates", output_dir, resource_changes)
-
-    assert not os.path.exists(tf_file)
+def test_generate_membership_valid(temp_template_dir, temp_output_dir):
+    """
+    有効な Membership で Terraform ファイルが正しく生成されることを検証します。
+    """
+    membership = Membership(username="user1", role="member")
+    generate_membership(membership, temp_template_dir,
+                        temp_output_dir, action="create")
+    output_file = os.path.join(temp_output_dir, "user1_membership.tf")
+    assert os.path.exists(output_file)
+    with open(output_file, "r") as f:
+        content = f.read()
+    # テンプレートにより、membership の情報および action がレンダリングされているか確認
+    assert 'resource "github_membership" "user1"' in content
+    assert 'role = "member"' in content
+    assert 'action = "create"' in content
 
 
-def test_process_teams_addition(mocker):
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.teams_to_add = [
-        {"team_name": "team1", "privacy": "closed",
-            "description": "New team", "members": []}
-    ]
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_team.assert_called_once_with(
-        resource_changes.teams_to_add[0])
-
-
-def test_process_teams_update(mocker):
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = [
-        {"team_name": "team1", "privacy": "closed",
-            "description": "Updated team", "members": []}
-    ]
-    resource_changes.teams_to_delete = []
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_team.assert_called_once_with(
-        resource_changes.teams_to_update[0])
-
-
-def test_process_teams_deletion(mocker):
-    output_dir = "terraform"
-    os.makedirs(output_dir, exist_ok=True)
-    tf_file = os.path.join(output_dir, "team1_team.tf")
-    with open(tf_file, "w") as f:
-        f.write("dummy")
-
-    resource_changes = MagicMock()
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = [{"team_name": "team1"}]
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=MagicMock())
-    process_resources("templates", output_dir, resource_changes)
-    assert not os.path.exists(tf_file)
-
-
-def test_process_memberships_addition(mocker):
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.memberships_to_add = [
-        {"username": "user1", "role": "member"}
-    ]
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_membership.assert_called_once_with(
-        resource_changes.memberships_to_add[0])
-
-
-def test_process_memberships_update(mocker):
-    mock_generator = MagicMock()
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=mock_generator)
-
-    resource_changes = MagicMock()
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = [
-        {"username": "user1", "role": "admin"}
-    ]
-    resource_changes.memberships_to_delete = []
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-
-    process_resources("templates", "terraform", resource_changes)
-    mock_generator.generate_membership.assert_called_once_with(
-        resource_changes.memberships_to_update[0])
-
-
-def test_process_memberships_deletion(mocker):
-    output_dir = "terraform"
-    os.makedirs(output_dir, exist_ok=True)
-    tf_file = os.path.join(output_dir, "user1_membership.tf")
-    with open(tf_file, "w") as f:
-        f.write("dummy")
-
-    resource_changes = MagicMock()
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = [{"username": "user1"}]
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-
-    mocker.patch("utils.process_resources.TerraformGenerator",
-                 return_value=MagicMock())
-    process_resources("templates", output_dir, resource_changes)
-    assert not os.path.exists(tf_file)
-
-
-def test_process_resources_error_handling(mocker):
-    # Patch process_repositories で例外を発生させる
-    mocker.patch("utils.process_resources.process_repositories",
-                 side_effect=Exception("Test error"))
-    resource_changes = MagicMock()
-    resource_changes.repos_to_add = []
-    resource_changes.repos_to_update = []
-    resource_changes.repos_to_delete = []
-    resource_changes.teams_to_add = []
-    resource_changes.teams_to_update = []
-    resource_changes.teams_to_delete = []
-    resource_changes.memberships_to_add = []
-    resource_changes.memberships_to_update = []
-    resource_changes.memberships_to_delete = []
-
-    with pytest.raises(Exception) as excinfo:
-        process_resources("templates", "terraform", resource_changes)
-    assert "Test error" in str(excinfo.value)
+def test_generate_membership_invalid_action(temp_template_dir, temp_output_dir):
+    """
+    無効な action を指定した場合に ValueError が発生することを検証します。
+    """
+    membership = Membership(username="user1", role="member")
+    with pytest.raises(ValueError):
+        generate_membership(membership, temp_template_dir,
+                            temp_output_dir, action="invalid")

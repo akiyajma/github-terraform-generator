@@ -10,3 +10,5 @@ default_team:
   privacy: "closed"
   role: "member"
   description: "Default team"
+default_membership:
+  role: "member"

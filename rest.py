@@ -21,6 +21,8 @@ default_team:
   role: "member"
 default_membership:
   role: "member"
+default_repository_collaborator:
+  permission: "pull"
 """)
 
 # Terraform の状態ファイルパスを確認
@@ -60,6 +62,20 @@ os.environ["MEMBERSHIPS"] = json.dumps([
     {"username": "user1", "role": "member"},
     {"username": "user2", "role": "member"},
     {"username": "user3", "role": "member"}
+])
+
+# 外部コラボレータのデータを追加
+os.environ["REPOSITORY_COLLABORATORS"] = json.dumps([
+    {
+        "repository_name": "repo1",
+        "username": "external_user1",
+        "permission": "push"
+    },
+    {
+        "repository_name": "repo1",
+        "username": "external_user2",
+        "permission": "pull"
+    }
 ])
 
 # 作業ディレクトリをプロジェクトルートに変更

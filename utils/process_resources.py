@@ -68,7 +68,8 @@ def process_repositories(generator, output_dir, repos_to_add, repos_to_update, r
                     logger.info(f"Deleted Terraform file: {tf_file}")
                 else:
                     logger.warning(
-                        f"Terraform file not found for deletion: {tf_file}")
+                        f"Terraform file not found for deletion: "
+                        f"{tf_file}")
             except Exception as e:
                 raise Exception(f"Error deleting repository '{
                                 repo.get('repository_name', 'unknown')}': {e}")
@@ -185,6 +186,48 @@ def process_memberships(generator, output_dir, memberships_to_add, memberships_t
         raise Exception(f"Unexpected error processing memberships: {e}")
 
 
+def process_repo_collaborators(generator, output_dir, collaborators_to_add, collaborators_to_update, collaborators_to_delete):
+    """
+    Handle the lifecycle of repository collaborators: addition, update, and deletion.
+    """
+    try:
+        # Process additions
+        for collab in collaborators_to_add:
+            try:
+                generator.generate_repository_collaborator(collab)
+            except Exception as e:
+                raise Exception(
+                    f"Error adding repository collaborator '{collab.get('username', 'unknown')}' "
+                    f"for repository '{collab.get('repository_name', 'unknown')}': {e}")
+        # Process updates
+        for collab in collaborators_to_update:
+            try:
+                generator.generate_repository_collaborator(collab)
+            except Exception as e:
+                raise Exception(
+                    f"Error updating repository collaborator '{collab.get('username', 'unknown')}' "
+                    f"for repository '{collab.get('repository_name', 'unknown')}': {e}"
+                )
+        # Process deletions
+        for collab in collaborators_to_delete:
+            try:
+                tf_file = os.path.join(
+                    output_dir, f"{collab['username']}_{collab['repository_name']}_collaborator.tf")
+                if os.path.exists(tf_file):
+                    os.remove(tf_file)
+                    logger.info(f"Deleted Terraform file: {tf_file}")
+                else:
+                    logger.warning(
+                        f"Terraform file not found for deletion: {tf_file}")
+            except Exception as e:
+                raise Exception(
+                    f"Error deleting repository collaborator '{collab.get('username', 'unknown')}' "
+                    f"for repository '{collab.get('repository_name', 'unknown')}': {e}")
+    except Exception as e:
+        raise Exception(
+            f"Unexpected error processing repository collaborators: {e}")
+
+
 def process_resources(template_dir, output_dir, resource_changes):
     try:
         generator = TerraformGenerator(template_dir, output_dir)
@@ -211,6 +254,13 @@ def process_resources(template_dir, output_dir, resource_changes):
             resource_changes.memberships_to_add,
             resource_changes.memberships_to_update,
             resource_changes.memberships_to_delete,
+        )
+        process_repo_collaborators(
+            generator,
+            output_dir,
+            resource_changes.repo_collaborators_to_add,
+            resource_changes.repo_collaborators_to_update,
+            resource_changes.repo_collaborators_to_delete,
         )
         logger.info("Resource processing completed successfully.")
     except Exception as e:

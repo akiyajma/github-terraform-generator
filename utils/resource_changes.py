@@ -2,9 +2,9 @@ class ResourceChanges:
     """
     Represents the changes to be applied to resources (repositories and teams).
 
-    This class encapsulates lists of repositories and teams to add, update, or delete, 
+    This class encapsulates lists of repositories and teams to add, update, or delete,
     providing a structured way to manage changes during Terraform configuration generation.
-    It includes attributes like `gitignore_template` and `description` for repositories 
+    It includes attributes like `gitignore_template` and `description` for repositories
     and `description` for teams to ensure detailed resource definitions.
 
     Attributes:
@@ -50,7 +50,8 @@ class ResourceChanges:
 
     def __init__(self, repos_to_add, repos_to_update, repos_to_delete,
                  teams_to_add, teams_to_update, teams_to_delete,
-                 memberships_to_add, memberships_to_update, memberships_to_delete):
+                 memberships_to_add, memberships_to_update, memberships_to_delete,
+                 repo_collaborators_to_add, repo_collaborators_to_update, repo_collaborators_to_delete):
         """
         Initialize the ResourceChanges instance with lists of changes.
 
@@ -98,3 +99,6 @@ class ResourceChanges:
         self.memberships_to_add = memberships_to_add
         self.memberships_to_update = memberships_to_update
         self.memberships_to_delete = memberships_to_delete
+        self.repo_collaborators_to_add = repo_collaborators_to_add
+        self.repo_collaborators_to_update = repo_collaborators_to_update
+        self.repo_collaborators_to_delete = repo_collaborators_to_delete
