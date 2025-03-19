@@ -8,7 +8,21 @@ from utils.tfstate_loader import extract_resources, load_tfstate, save_existing_
 
 def test_extract_resources_valid():
     """
-    正常系: tfstate から repository, team, membership を正しく抽出できることを検証する。
+    Test `extract_resources` function for successful extraction.
+
+    This test verifies that repositories, teams, and memberships are correctly
+    extracted from a valid Terraform state (`tfstate`).
+
+    Steps:
+    1. Define a `tfstate` with:
+       - A repository (`repo1`)
+       - A team (`team1`)
+       - A membership (`user1`)
+    2. Call `extract_resources()`.
+    3. Validate that:
+       - The repository count is correct, and `repository_name` is extracted properly.
+       - The team count is correct, and `team_name` is extracted properly.
+       - The membership count is correct, and `username` is extracted properly.
     """
     tfstate = {
         "resources": [
@@ -61,8 +75,10 @@ def test_extract_resources_valid():
 
 def test_extract_resources_keyerror():
     """
-    キーが不足している場合に KeyError が発生することを検証する。
-    例として、repository の attributes から "name" キーが欠如している場合。
+    Test that `extract_resources` raises a `KeyError` when an expected key is missing.
+
+    This test ensures that:
+    - A missing key (`name` in `github_repository`) results in a `KeyError`.
     """
     tfstate = {
         "resources": [
@@ -71,7 +87,7 @@ def test_extract_resources_keyerror():
                 "instances": [
                     {
                         "attributes": {
-                            # "name" キーがない
+                            # Missing "name" key
                             "description": "No name repo",
                             "visibility": "public",
                             "gitignore_template": "Python"
@@ -87,12 +103,17 @@ def test_extract_resources_keyerror():
 
 
 def test_extract_resources_unexpected_exception():
+    """
+    Test that `extract_resources` handles unexpected exceptions.
+
+    This test introduces an invalid `instances` value (a string instead of a list)
+    to trigger an `AttributeError` in the loop.
+    """
     tfstate = {
         "resources": [
             {
                 "type": "github_repository",
-                # instances を文字列にして、for ループで AttributeError を発生させる
-                "instances": "not a list"
+                "instances": "not a list"  # Invalid structure
             }
         ]
     }
@@ -103,7 +124,10 @@ def test_extract_resources_unexpected_exception():
 
 def test_load_tfstate_file_not_found(tmp_path):
     """
-    存在しない tfstate ファイルを指定した場合に FileNotFoundError が発生することを検証する。
+    Test that `load_tfstate` raises `FileNotFoundError` for a missing file.
+
+    This test ensures that attempting to load a non-existent `tfstate` file
+    correctly raises an exception.
     """
     non_existent = tmp_path / "nonexistent.tfstate"
     with pytest.raises(FileNotFoundError):
@@ -112,7 +136,10 @@ def test_load_tfstate_file_not_found(tmp_path):
 
 def test_load_tfstate_invalid_json(tmp_path):
     """
-    無効な JSON の tfstate ファイルを読み込もうとした場合に JSONDecodeError が発生することを検証する。
+    Test that `load_tfstate` raises `json.JSONDecodeError` for invalid JSON content.
+
+    This test writes an invalid JSON string to a file and ensures that
+    `load_tfstate()` raises an error when attempting to parse it.
     """
     file_path = tmp_path / "invalid.tfstate"
     file_path.write_text("not valid json")
@@ -122,7 +149,12 @@ def test_load_tfstate_invalid_json(tmp_path):
 
 def test_load_tfstate_valid(tmp_path):
     """
-    正常な tfstate ファイルを読み込み、正しい辞書が返されることを検証する。
+    Test that `load_tfstate` correctly loads a valid Terraform state file.
+
+    Steps:
+    1. Write a valid JSON Terraform state file.
+    2. Call `load_tfstate()`.
+    3. Ensure that the returned dictionary matches the expected content.
     """
     data = {"resources": []}
     file_path = tmp_path / "valid.tfstate"
@@ -133,7 +165,12 @@ def test_load_tfstate_valid(tmp_path):
 
 def test_save_existing_state(tmp_path):
     """
-    save_existing_state が正しく JSON ファイルを生成することを検証する。
+    Test `save_existing_state` function for correct JSON file generation.
+
+    Steps:
+    1. Define a state dictionary with repositories and teams.
+    2. Call `save_existing_state()` to save it as a JSON file.
+    3. Load the file and verify that the content matches the original state.
     """
     state = {
         "repositories": [{"repository_name": "repo1", "visibility": "public", "description": "A repo"}],
@@ -148,12 +185,17 @@ def test_save_existing_state(tmp_path):
 
 def test_save_existing_state_oserror(monkeypatch, tmp_path):
     """
-    出力ディレクトリ作成時に OSError が発生した場合、適切な例外が発生することを検証する。
+    Test that `save_existing_state` raises an `OSError` if the output directory cannot be created.
+
+    This test patches `os.makedirs` to simulate a failure when creating directories.
     """
     file_path = tmp_path / "existing_state.json"
-    # os.makedirs をパッチして OSError を発生させる
+
+    # Patch `os.makedirs` to raise an `OSError`
     monkeypatch.setattr(os, "makedirs", lambda path, exist_ok=True: (
-        _ for _ in ()).throw(OSError("Test OSError")))
+        _ for _ in ()).throw(OSError("Test OSError"))
+    )
+
     with pytest.raises(OSError) as excinfo:
         save_existing_state({}, str(file_path))
     assert "Failed to save existing state" in str(excinfo.value)

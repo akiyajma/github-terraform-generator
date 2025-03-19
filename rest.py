@@ -1,15 +1,15 @@
 import json
 import os
 
-from main import main  # main.pyをインポート
+from main import main  # Importing main.py
 
-# プロジェクトのルートディレクトリを取得
+# Get the project root directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# config.yaml のパスを確認
+# Check if config.yaml exists
 config_path = os.path.join(BASE_DIR, "config/config.yaml")
 if not os.path.exists(config_path):
-    # config.yaml を生成
+    # Create config.yaml with default settings
     with open(config_path, "w") as f:
         f.write("""\
 template_dir: "templates"
@@ -25,12 +25,12 @@ default_repository_collaborator:
   permission: "pull"
 """)
 
-# Terraform の状態ファイルパスを確認
+# Check if the Terraform state file exists
 terraform_dir = os.path.join(BASE_DIR, "terraform")
-os.makedirs(terraform_dir, exist_ok=True)
+os.makedirs(terraform_dir, exist_ok=True)  # Ensure the directory exists
 tfstate_path = os.path.join(terraform_dir, "terraform.tfstate")
 if not os.path.exists(tfstate_path):
-    # terraform.tfstate を生成
+    # Create a new terraform.tfstate file with an initial empty state
     with open(tfstate_path, "w") as f:
         f.write(json.dumps({
             "version": 4,
@@ -38,7 +38,7 @@ if not os.path.exists(tfstate_path):
             "resources": []
         }))
 
-# 環境変数を設定
+# Set environment variables for repositories
 os.environ["REPOSITORIES"] = json.dumps([
     {
         "repository_name": "repo1",
@@ -48,6 +48,7 @@ os.environ["REPOSITORIES"] = json.dumps([
     }
 ])
 
+# Set environment variables for teams
 os.environ["TEAMS"] = json.dumps([
     {
         "team_name": "team1",
@@ -57,14 +58,14 @@ os.environ["TEAMS"] = json.dumps([
     }
 ])
 
-# MEMBERSHIPS を追加（全員 "member" とする）
+# Add memberships (all users as "member")
 os.environ["MEMBERSHIPS"] = json.dumps([
     {"username": "user1", "role": "member"},
     {"username": "user2", "role": "member"},
     {"username": "user3", "role": "member"}
 ])
 
-# 外部コラボレータのデータを追加
+# Add external collaborators
 os.environ["REPOSITORY_COLLABORATORS"] = json.dumps([
     {
         "repository_name": "repo1",
@@ -78,11 +79,11 @@ os.environ["REPOSITORY_COLLABORATORS"] = json.dumps([
     }
 ])
 
-# 作業ディレクトリをプロジェクトルートに変更
+# Change working directory to the project root
 os.chdir(BASE_DIR)
 
-# main.pyを呼び出して実行
+# Execute main.py
 if __name__ == "__main__":
-    # 必要ならカスタムの出力ディレクトリを指定可能
+    # If needed, specify a custom output directory
     custom_output_dir = os.path.join(BASE_DIR, "terraform")
     main(output_dir_override=custom_output_dir)

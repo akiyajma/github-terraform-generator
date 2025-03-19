@@ -20,59 +20,77 @@ setup_logging()
 
 def main(output_dir_override=None):
     """
-    Main function to process and apply changes to the Terraform state.
+    Main function to manage and apply changes to the Terraform state.
 
-    This function serves as the entry point for managing resources defined in Terraform state.
-    It performs the following steps:
-    1. Loads the application configuration from `config.yaml`.
-    2. Loads the existing Terraform state from the specified file.
-    3. Extracts resources (repositories and teams) from the Terraform state.
-    4. Compares the extracted resources with the new resources provided via environment variables,
-       applying default values from `config.yaml` where applicable.
-    5. Calculates the differences (additions, updates, deletions) between the existing and new resources.
-    6. Applies the changes by generating, updating, or deleting Terraform files.
+    This function is responsible for processing GitHub repositories, teams, memberships,
+    and repository collaborators, comparing them with the existing Terraform state, and applying
+    necessary changes through Terraform configuration files.
+
+    The process includes:
+    1. Loading the application configuration from `config.yaml`.
+    2. Loading the existing Terraform state from the specified `.tfstate` file.
+    3. Extracting relevant resources (repositories, teams, memberships, and collaborators) from Terraform state.
+    4. Fetching new resource definitions from environment variables.
+    5. Applying default values for missing attributes using `config.yaml`.
+    6. Calculating the differences (additions, updates, deletions) between existing and new resources.
+    7. Generating, updating, or deleting Terraform configuration files based on the computed differences.
 
     Args:
-        output_dir_override (str, optional): Overrides the output directory specified in the configuration.
-            If not provided, the output directory specified in `config.yaml` is used.
+        output_dir_override (str, optional): A custom output directory. If not provided,
+            the directory specified in `config.yaml` is used.
 
     Environment Variables:
-        REPOSITORIES (str): A JSON-encoded list of repository definitions. Each repository should include:
-            - `repository_name` (str): The name of the repository.
+        - `REPOSITORIES` (str): JSON array defining repositories.
+            Each repository should have:
+            - `repository_name` (str, required): The repository's name.
             - `description` (str, optional): A description of the repository.
-            - `visibility` (str): The visibility of the repository (e.g., "public" or "private").
-            - `gitignore_template` (str, optional): The Git ignore template to apply.
-              If set to "None", this attribute will be excluded from the generated Terraform configuration.
-        TEAMS (str): A JSON-encoded list of team definitions. Each team should include:
-            - `team_name` (str): The name of the team.
-            - `description` (str, optional): A description of the team.
-            - `privacy` (str): The privacy level of the team (e.g., "closed" or "secret").
-            - `members` (list[dict], optional): A list of team members with their roles.
+            - `visibility` (str, required): "public", "private", or "internal".
+            - `gitignore_template` (str, optional): A predefined `.gitignore` template.
+              If set to `"None"`, it is omitted.
+
+        - `TEAMS` (str): JSON array defining teams.
+            Each team should have:
+            - `team_name` (str, required): The team’s name.
+            - `description` (str, optional): A short description.
+            - `privacy` (str, required): "closed" or "secret".
+            - `members` (list[dict], optional): A list of members, each having:
+                - `username` (str, required): The GitHub username.
+                - `role` (str, required): "maintainer" or "member".
+
+        - `MEMBERSHIPS` (str): JSON array defining user memberships.
+            Each membership should have:
+            - `username` (str, required): The GitHub username.
+            - `role` (str, required): "admin" or "member".
+
+        - `REPOSITORY_COLLABORATORS` (str): JSON array defining repository collaborators.
+            Each collaborator should have:
+            - `repository_name` (str, required): The repository name.
+            - `username` (str, required): The collaborator's GitHub username.
+            - `permission` (str, required): "pull", "push", or "admin".
 
     Configuration:
-        The application configuration (`config.yaml`) includes:
-        - `default_repository` (dict): Default values for repository attributes, applied if not explicitly provided.
-        - `default_team` (dict): Default values for team attributes, applied if not explicitly provided.
+        - The `config.yaml` file defines default values for missing attributes.
+        - The Terraform state file (`terraform.tfstate`) is used to track existing resources.
 
     Raises:
-        SystemExit: Exits the script with status code 1 if an unhandled error occurs.
+        - `SystemExit`: If any unhandled error occurs, the script exits with status code 1.
 
     Logs:
-        - Logs informational messages about the processing steps.
-        - Logs errors with details if any step fails.
+        - Logs the processing steps, including resource comparisons and updates.
+        - Logs errors when operations fail.
 
-    Example:
-        To override the output directory and process changes:
+    Example Usage:
+        To override the output directory and apply changes:
         >>> main(output_dir_override="/custom/output/dir")
 
-    Files Used:
-        - Configuration: `config/config.yaml`
-        - Terraform state: `<output_dir>/terraform.tfstate`
-        - Resource changes are saved to `<output_dir>/existing_resources.json`.
+    File References:
+        - Configuration file: `config/config.yaml`
+        - Terraform state file: `<output_dir>/terraform.tfstate`
+        - Saved resource state: `<output_dir>/existing_resources.json`
 
     Notes:
-        - The `gitignore_template` field in repositories is conditionally included based on its value.
-          If the value is "None", it will be excluded from the generated Terraform configuration.
+        - If a `gitignore_template` is set to `"None"`, it is excluded from the Terraform configuration.
+        - The script ensures only necessary changes are applied, minimizing updates to existing resources.
     """
     try:
         # Load configuration

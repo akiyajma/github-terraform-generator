@@ -6,7 +6,11 @@ from models.repository import Repository
 
 def test_repository_model_valid():
     """
-    有効な Repository モデルが正しく生成されることを検証します。
+    Test that a valid `Repository` model is created successfully.
+
+    This test ensures that:
+    - The model correctly initializes with the provided attributes.
+    - The `repository_name`, `visibility`, and `gitignore_template` are properly set.
     """
     data = {
         "repository_name": "repo1",
@@ -22,7 +26,10 @@ def test_repository_model_valid():
 
 def test_repository_model_invalid_visibility():
     """
-    無効な visibility を指定した場合に ValidationError が発生することを検証します。
+    Test that a `ValidationError` is raised for an invalid `visibility` value.
+
+    This test verifies that providing an unsupported `visibility` value
+    (not "public", "private", or "internal") triggers a validation error.
     """
     data = {
         "repository_name": "repo1",

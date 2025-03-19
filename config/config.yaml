@@ -12,3 +12,5 @@ default_team:
   description: "Default team"
 default_membership:
   role: "member"
+default_repository_collaborator:
+  permission: "pull"

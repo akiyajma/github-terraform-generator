@@ -6,34 +6,45 @@ from loguru import logger
 
 def save_existing_state(state, output_file):
     """
-    Save the current state of resources to a file in JSON format.
+    Save the extracted state of resources to a JSON file.
 
-    This function ensures the output directory exists and writes the given state
-    as a JSON file to the specified file path. The state typically includes details
-    about repositories (e.g., `repository_name`, `description`, `gitignore_template`)
-    and teams.
+    This function ensures that the specified output directory exists before writing
+    the resource state as a JSON file. The saved state includes information about
+    repositories, teams, memberships, and repository collaborators.
 
     Args:
-        state (dict): The current state of resources to be saved, including:
-            - "repositories" (list[dict]): Each repository dictionary may contain:
-                - `repository_name` (str): The name of the repository.
-                - `description` (str): A description of the repository.
-                - `visibility` (str): The visibility of the repository.
-                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
-            - "teams" (list[dict]): Each team dictionary may contain:
-                - `team_name` (str): The name of the team.
-                - `description` (str): A description of the team.
-                - `privacy` (str): The privacy setting of the team.
-        output_file (str): The file path where the state will be saved.
+        state (dict): The current state of resources, structured as:
+            - "repositories" (list[dict]): List of repositories, each containing:
+                - `repository_name` (str): Name of the repository.
+                - `description` (str, optional): Repository description.
+                - `visibility` (str): Visibility level ("public", "private").
+                - `gitignore_template` (str, optional): Git ignore template (if any).
+            - "teams" (list[dict]): List of teams, each containing:
+                - `team_name` (str): Team name.
+                - `description` (str, optional): Team description.
+                - `privacy` (str): Privacy level ("closed", "secret").
+                - `members` (list[dict], optional): List of team members (if any).
+            - "memberships" (list[dict]): List of GitHub memberships, each containing:
+                - `username` (str): GitHub username.
+                - `role` (str): Role within the organization ("member", "admin").
+            - "repository_collaborators" (list[dict]): List of repository collaborators, each containing:
+                - `repository_name` (str): Repository to which the user is added.
+                - `username` (str): Collaborator's GitHub username.
+                - `permission` (str): Assigned permission ("pull", "push", "admin").
+                - `collaborator_id` (str): Unique ID (`repository_name_username`).
+
+        output_file (str): The file path where the extracted state will be saved.
 
     Raises:
-        OSError: If there is an error creating the output directory or writing the file.
-        Exception: For other unexpected errors during the save operation.
+        OSError: If there is an issue creating the directory or writing the file.
+        Exception: If any unexpected error occurs during saving.
 
     Example:
         state = {
-            "repositories": [{"repository_name": "repo1", "visibility": "public", "description": "A public repo"}],
-            "teams": [{"team_name": "team1", "description": "A new team", "privacy": "closed"}]
+            "repositories": [{"repository_name": "repo1", "visibility": "public", "description": "A public repository"}],
+            "teams": [{"team_name": "dev-team", "description": "Development team", "privacy": "closed"}],
+            "memberships": [{"username": "user1", "role": "member"}],
+            "repository_collaborators": [{"repository_name": "repo1", "username": "user2", "permission": "push"}]
         }
         save_existing_state(state, "output/existing_state.json")
     """
@@ -51,18 +62,18 @@ def save_existing_state(state, output_file):
 
 def load_tfstate(tfstate_file):
     """
-    Load and parse the Terraform state file in JSON format.
+    Load and parse the Terraform state file (`terraform.tfstate`) in JSON format.
 
     Args:
-        tfstate_file (str): The file path to the Terraform state file.
+        tfstate_file (str): Path to the Terraform state file.
 
     Returns:
         dict: The parsed Terraform state as a Python dictionary.
 
     Raises:
         FileNotFoundError: If the specified tfstate file does not exist.
-        json.JSONDecodeError: If the tfstate file contains invalid JSON content.
-        Exception: For other unexpected errors during file reading or parsing.
+        json.JSONDecodeError: If the file contains invalid JSON content.
+        Exception: If any other error occurs during file reading or parsing.
 
     Example:
         tfstate = load_tfstate("path/to/terraform.tfstate")
@@ -72,7 +83,7 @@ def load_tfstate(tfstate_file):
         with open(tfstate_file, "r") as f:
             return json.load(f)
     except FileNotFoundError as e:
-        raise FileNotFoundError(f"tfstate file not found: {e}")
+        raise FileNotFoundError(f"Terraform state file not found: {e}")
     except json.JSONDecodeError as e:
         raise json.JSONDecodeError(
             f"Invalid JSON format in {tfstate_file}: {e}", e.doc, e.pos)
@@ -82,32 +93,44 @@ def load_tfstate(tfstate_file):
 
 def extract_resources(tfstate):
     """
-    Extract lists of repositories and teams from the Terraform state.
+    Extract repositories, teams, memberships, and repository collaborators from the Terraform state.
 
-    This function processes the Terraform state dictionary and identifies
-    resources of type `github_repository` and `github_team`, extracting their
-    relevant attributes such as `repository_name`, `description`, `gitignore_template`, etc.
+    This function processes the Terraform state to identify resources of type:
+    - `github_repository`
+    - `github_team`
+    - `github_membership`
+    - `github_repository_collaborator`
+
+    It extracts relevant attributes such as repository names, team descriptions,
+    user roles, and repository collaborator permissions.
 
     Args:
-        tfstate (dict): The Terraform state dictionary, typically containing
-            a `resources` key with a list of resource definitions.
+        tfstate (dict): The Terraform state dictionary, containing a `resources` key.
 
     Returns:
-        dict: A dictionary containing two keys:
-            - "repositories" (list[dict]): A list of repositories, where each dictionary includes:
-                - `repository_name` (str): The name of the repository.
-                - `description` (str, optional): A description of the repository.
-                - `visibility` (str): The visibility of the repository (e.g., "public", "private").
-                - `gitignore_template` (str, optional): A `.gitignore` template, if applicable.
-            - "teams" (list[dict]): A list of teams, where each dictionary includes:
-                - `team_name` (str): The name of the team.
-                - `description` (str, optional): A description of the team.
-                - `privacy` (str): The privacy level of the team (e.g., "closed", "secret").
+        dict: A dictionary containing:
+            - "repositories" (list[dict]): List of repositories with attributes:
+                - `repository_name` (str): Name of the repository.
+                - `description` (str, optional): Repository description.
+                - `visibility` (str): Visibility level ("public", "private").
+                - `gitignore_template` (str, optional): Git ignore template (if any).
+            - "teams" (list[dict]): List of teams with attributes:
+                - `team_name` (str): Team name.
+                - `description` (str, optional): Team description.
+                - `privacy` (str): Privacy level ("closed", "secret").
                 - `members` (list[dict], optional): Team members (future support).
+            - "memberships" (list[dict]): List of GitHub memberships with attributes:
+                - `username` (str): GitHub username.
+                - `role` (str): Role within the organization ("member", "admin").
+            - "repository_collaborators" (list[dict]): List of repository collaborators with attributes:
+                - `repository_name` (str): Repository name.
+                - `username` (str): GitHub username of the collaborator.
+                - `permission` (str): Assigned permission ("pull", "push", "admin").
+                - `collaborator_id` (str): Unique ID (`repository_name_username`).
 
     Raises:
-        KeyError: If expected keys are missing in the Terraform state.
-        Exception: For other unexpected errors during resource extraction.
+        KeyError: If required keys are missing in the Terraform state.
+        Exception: If an unexpected error occurs during extraction.
 
     Example:
         tfstate = {
@@ -118,14 +141,24 @@ def extract_resources(tfstate):
                 },
                 {
                     "type": "github_team",
-                    "instances": [{"attributes": {"name": "team1", "privacy": "closed", "description": "Dev team"}}]
+                    "instances": [{"attributes": {"name": "dev-team", "privacy": "closed", "description": "Development team"}}]
+                },
+                {
+                    "type": "github_membership",
+                    "instances": [{"attributes": {"username": "user1", "role": "member"}}]
+                },
+                {
+                    "type": "github_repository_collaborator",
+                    "instances": [{"attributes": {"repository": "repo1", "username": "user2", "permission": "push"}}]
                 }
             ]
         }
-        resources = extract_resources(tfstate)
-        # resources -> {
+        extracted = extract_resources(tfstate)
+        # extracted -> {
         #     "repositories": [{"repository_name": "repo1", "description": "Sample repo", "visibility": "public", "gitignore_template": "Python"}],
-        #     "teams": [{"team_name": "team1", "description": "Dev team", "privacy": "closed"}]
+        #     "teams": [{"team_name": "dev-team", "description": "Development team", "privacy": "closed"}],
+        #     "memberships": [{"username": "user1", "role": "member"}],
+        #     "repository_collaborators": [{"repository_name": "repo1", "username": "user2", "permission": "push", "collaborator_id": "repo1_user2"}]
         # }
     """
     try:
@@ -151,7 +184,7 @@ def extract_resources(tfstate):
                         "team_name": attributes["name"],
                         "description": attributes.get("description", ""),
                         "privacy": attributes["privacy"],
-                        "members": []  # 将来的にメンバー情報を追加する場合
+                        "members": []
                     })
             elif resource["type"] == "github_membership":
                 for instance in resource.get("instances", []):

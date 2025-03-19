@@ -3,12 +3,22 @@ from pydantic import BaseModel, Field
 
 class Membership(BaseModel):
     """
-    GitHub Membership のモデル
+    Model representing a GitHub membership.
+
+    This model defines the structure for a GitHub membership, including the username,
+    membership role, and whether deletion is allowed. It ensures that the role is
+    either "member" or "admin" using validation constraints.
 
     Attributes:
-        username (str): ユーザー名。
-        role (str): メンバーシップの役割 ("member" または "admin")。
-        allow_delete (bool): 削除可能かどうかのフラグ。デフォルトは False。
+        username (str): The GitHub username of the member.
+        role (str): The membership role, which must be either "member" or "admin".
+        allow_delete (bool): A flag indicating whether the membership can be deleted.
+            Defaults to `False`.
+
+    Example:
+        >>> membership = Membership(username="user1", role="admin", allow_delete=True)
+        >>> print(membership)
+        Membership(username='user1', role='admin', allow_delete=True)
     """
     username: str
     role: str = Field(..., pattern="^(member|admin)$")

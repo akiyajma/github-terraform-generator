@@ -149,10 +149,41 @@ def process_teams(generator, output_dir, teams_to_add, teams_to_update, teams_to
 
 def process_memberships(generator, output_dir, memberships_to_add, memberships_to_update, memberships_to_delete):
     """
-    GitHub Membership の追加・更新・削除を処理する
+    Manage the lifecycle of GitHub user memberships: addition, update, and deletion.
+
+    This function:
+    - Generates Terraform configuration files for new or updated GitHub user memberships.
+    - Deletes Terraform files for memberships that are removed.
+    - Ensures that membership attributes such as `username` and `role`
+      are correctly reflected in Terraform.
+
+    Args:
+        generator (TerraformGenerator): An instance of the Terraform generator.
+        output_dir (str): The directory where Terraform files are generated or deleted.
+        memberships_to_add (list[dict]): List of user memberships to be created.
+        memberships_to_update (list[dict]): List of user memberships to be updated.
+        memberships_to_delete (list[dict]): List of user memberships to be deleted.
+
+    Raises:
+        Exception: If an error occurs during any membership operation (addition, update, deletion).
+
+    Example:
+        process_memberships(
+            generator=TerraformGenerator(template_dir="templates", output_dir="output"),
+            output_dir="output",
+            memberships_to_add=[
+                {"username": "user1", "role": "member"}
+            ],
+            memberships_to_update=[
+                {"username": "user2", "role": "admin"}
+            ],
+            memberships_to_delete=[
+                {"username": "user3"}
+            ]
+        )
     """
     try:
-        # 追加処理
+        # Process membership additions
         for membership in memberships_to_add:
             try:
                 generator.generate_membership(membership)
@@ -160,7 +191,7 @@ def process_memberships(generator, output_dir, memberships_to_add, memberships_t
                 raise Exception(
                     f"Error adding membership '{membership.get('username', 'unknown')}': {e}")
 
-        # 更新処理
+        # Process membership updates
         for membership in memberships_to_update:
             try:
                 generator.generate_membership(membership)
@@ -168,7 +199,7 @@ def process_memberships(generator, output_dir, memberships_to_add, memberships_t
                 raise Exception(
                     f"Error updating membership '{membership.get('username', 'unknown')}': {e}")
 
-        # 削除処理
+        # Process membership deletions
         for membership in memberships_to_delete:
             try:
                 tf_file = os.path.join(
@@ -188,7 +219,45 @@ def process_memberships(generator, output_dir, memberships_to_add, memberships_t
 
 def process_repo_collaborators(generator, output_dir, collaborators_to_add, collaborators_to_update, collaborators_to_delete):
     """
-    Handle the lifecycle of repository collaborators: addition, update, and deletion.
+    Manage the lifecycle of GitHub repository collaborators: addition, update, and deletion.
+
+    This function:
+    - Generates Terraform configuration files for new or updated repository collaborators.
+    - Deletes Terraform files for removed collaborators.
+    - Ensures that collaborator attributes such as `repository_name`, `username`, and `permission`
+      are correctly reflected in Terraform.
+
+    A repository collaborator is an external user who is granted specific permissions
+    (e.g., `pull`, `push`, `admin`) on a GitHub repository.
+
+    Args:
+        generator (TerraformGenerator): An instance of the Terraform generator.
+        output_dir (str): The directory where Terraform files are generated or deleted.
+        collaborators_to_add (list[dict]): List of repository collaborators to be created.
+        collaborators_to_update (list[dict]): List of repository collaborators to be updated.
+        collaborators_to_delete (list[dict]): List of repository collaborators to be deleted.
+
+    Raises:
+        Exception: If an error occurs during any collaborator operation (addition, update, deletion).
+
+    Example:
+        process_repo_collaborators(
+            generator=TerraformGenerator(template_dir="templates", output_dir="output"),
+            output_dir="output",
+            collaborators_to_add=[
+                {"repository_name": "repo1", "username": "external_user", "permission": "push"}
+            ],
+            collaborators_to_update=[
+                {"repository_name": "repo1", "username": "external_user", "permission": "admin"}
+            ],
+            collaborators_to_delete=[
+                {"repository_name": "repo2", "username": "old_user"}
+            ]
+        )
+
+    Notes:
+        - Permissions must be one of `"pull"`, `"push"`, or `"admin"`.
+        - If a collaborator is removed, their Terraform file is deleted from the `output_dir`.
     """
     try:
         # Process additions
@@ -231,7 +300,6 @@ def process_repo_collaborators(generator, output_dir, collaborators_to_add, coll
 def process_resources(template_dir, output_dir, resource_changes):
     try:
         generator = TerraformGenerator(template_dir, output_dir)
-        # リポジトリの処理
         process_repositories(
             generator,
             output_dir,
@@ -239,7 +307,6 @@ def process_resources(template_dir, output_dir, resource_changes):
             resource_changes.repos_to_update,
             resource_changes.repos_to_delete,
         )
-        # チームの処理
         process_teams(
             generator,
             output_dir,
@@ -247,7 +314,6 @@ def process_resources(template_dir, output_dir, resource_changes):
             resource_changes.teams_to_update,
             resource_changes.teams_to_delete,
         )
-        # Membership の処理を追加
         process_memberships(
             generator,
             output_dir,

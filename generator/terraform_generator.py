@@ -11,14 +11,15 @@ from .team_generator import generate_team
 
 class TerraformGenerator:
     """
-    A utility class for generating Terraform configuration files for GitHub repositories and teams.
+    A utility class for generating Terraform configuration files for GitHub resources.
 
-    This class encapsulates the logic for handling repository and team data, validating inputs,
-    and generating Terraform configuration files by rendering Jinja2 templates.
+    This class provides methods to generate Terraform configuration files for GitHub repositories,
+    teams, memberships, and repository collaborators. It processes the provided data and
+    renders Jinja2 templates to generate the necessary Terraform files.
 
     Attributes:
-        template_dir (str): The directory containing the Jinja2 templates.
-        output_dir (str): The directory where the generated Terraform files will be saved.
+        template_dir (str): The directory containing Jinja2 template files.
+        output_dir (str): The directory where the generated Terraform configuration files will be stored.
 
     Example:
         >>> generator = TerraformGenerator(template_dir="templates", output_dir="output")
@@ -28,11 +29,11 @@ class TerraformGenerator:
 
     def __init__(self, template_dir: str, output_dir: str):
         """
-        Initialize the TerraformGenerator.
+        Initializes the TerraformGenerator instance.
 
         Args:
             template_dir (str): Path to the directory containing Jinja2 templates.
-            output_dir (str): Path to the directory where Terraform files will be generated.
+            output_dir (str): Path to the directory where Terraform configuration files will be generated.
 
         Example:
             >>> generator = TerraformGenerator(template_dir="templates", output_dir="output")
@@ -153,10 +154,27 @@ class TerraformGenerator:
 
     def generate_membership(self, membership):
         """
-        GitHub Membership の Terraform ファイルを生成する
+        Generates a Terraform configuration file for GitHub memberships.
+
+        This method creates Terraform configuration files for GitHub memberships, linking users to organizations or teams.
 
         Args:
-            membership (Membership or dict or list[dict]): Membership データ
+            membership (Membership or dict or list[dict]): Membership data as:
+                - A single `Membership` object.
+                - A dictionary containing:
+                    - `username` (str): GitHub username.
+                    - `role` (str): User role (e.g., "member", "admin").
+                - A list of membership dictionaries or `Membership` objects.
+
+        Raises:
+            Exception: If an error occurs during template rendering or file creation.
+
+        Example:
+            >>> generator = TerraformGenerator("templates", "output")
+            >>> generator.generate_membership({
+                "username": "user1",
+                "role": "member"
+            })
         """
         try:
             if isinstance(membership, list):
@@ -175,7 +193,30 @@ class TerraformGenerator:
 
     def generate_repository_collaborator(self, repository_collaborator):
         """
-        Generate Terraform configuration file for a GitHub repository collaborator.
+        Generates a Terraform configuration file for GitHub repository collaborators.
+
+        This method creates Terraform configuration files for one or multiple repository collaborators,
+        defining their access permissions.
+
+        Args:
+            repository_collaborator (RepositoryCollaborator or dict or list[dict]): Collaborator data as:
+                - A single `RepositoryCollaborator` object.
+                - A dictionary containing:
+                    - `repository_name` (str): Repository name.
+                    - `username` (str): Collaborator's GitHub username.
+                    - `permission` (str): Permission level (e.g., "pull", "push", "admin").
+                - A list of repository collaborator dictionaries or `RepositoryCollaborator` objects.
+
+        Raises:
+            Exception: If an error occurs during template rendering or file creation.
+
+        Example:
+            >>> generator = TerraformGenerator("templates", "output")
+            >>> generator.generate_repository_collaborator({
+                "repository_name": "example-repo",
+                "username": "collab-user",
+                "permission": "push"
+            })
         """
         try:
             if isinstance(repository_collaborator, list):

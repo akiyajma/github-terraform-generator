@@ -6,7 +6,25 @@ from utils.diff_calculator import calculate_diff
 
 def test_calculate_diff_add_update_delete():
     """
-    Test the calculate_diff function with add, update, and delete cases.
+    Test `calculate_diff` function for handling additions, updates, and deletions.
+
+    This test ensures that:
+    - A new repository (`repo3`) is correctly added.
+    - An existing repository (`repo1`) with modified attributes is updated.
+    - A repository (`repo2`) marked with `allow_delete=True` is scheduled for deletion.
+
+    Steps:
+    1. Define an `existing` list with repositories currently in the state.
+    2. Define a `requested` list with the desired repositories, including:
+       - `repo1` (modified)
+       - `repo2` (marked for deletion)
+       - `repo3` (new addition)
+    3. Execute `calculate_diff()`.
+    4. Validate that:
+       - `to_add` contains `repo3`.
+       - `to_update` contains `repo1` with the updated attributes.
+       - `to_delete` contains `repo2`.
+
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -26,23 +44,28 @@ def test_calculate_diff_add_update_delete():
     to_add, to_update, to_delete = calculate_diff(
         existing, requested, "repository_name")
 
-    # Add: repo3 should be added
     assert len(to_add) == 1
     assert to_add[0]["repository_name"] == "repo3"
 
-    # Update: repo1 should be updated
     assert len(to_update) == 1
     assert to_update[0]["repository_name"] == "repo1"
     assert to_update[0]["description"] == "New repo1"
 
-    # Delete: repo2 should be marked for deletion due to allow_delete
     assert len(to_delete) == 1
     assert to_delete[0]["repository_name"] == "repo2"
 
 
 def test_calculate_diff_no_action():
     """
-    Test the calculate_diff function with no action required.
+    Test `calculate_diff` when no changes are required.
+
+    This test ensures that if the existing and requested states are identical,
+    the function does not produce any additions, updates, or deletions.
+
+    Steps:
+    1. Define identical `existing` and `requested` lists.
+    2. Execute `calculate_diff()`.
+    3. Verify that `to_add`, `to_update`, and `to_delete` are all empty.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -62,7 +85,13 @@ def test_calculate_diff_no_action():
 
 def test_calculate_diff_no_delete_without_allow_delete():
     """
-    Verify that no delete action occurs when allow_delete is not set to True.
+    Ensure `calculate_diff` does not delete a repository unless explicitly marked.
+
+    Steps:
+    1. Define an `existing` state with multiple repositories.
+    2. Define a `requested` state with fewer repositories but without `allow_delete=True`.
+    3. Execute `calculate_diff()`.
+    4. Ensure that no deletions are scheduled (`to_delete` is empty).
     """
     existing = [
         {"repository_name": "repo1", "description": "Existing repo1",
@@ -84,7 +113,12 @@ def test_calculate_diff_no_delete_without_allow_delete():
 
 def test_calculate_diff_with_only_updates():
     """
-    Verify that a repository is marked for update if attributes differ.
+    Verify `calculate_diff` correctly detects updates when no additions or deletions exist.
+
+    Steps:
+    1. Define `existing` and `requested` repositories, where the requested one has modified attributes.
+    2. Execute `calculate_diff()`.
+    3. Ensure `to_update` contains the modified repository, while `to_add` and `to_delete` remain empty.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -106,7 +140,13 @@ def test_calculate_diff_with_only_updates():
 
 def test_calculate_diff_explicit_delete():
     """
-    Verify that a repository is marked for deletion if allow_delete is True.
+    Ensure a repository is marked for deletion only when `allow_delete=True`.
+
+    Steps:
+    1. Define an `existing` repository.
+    2. Define a `requested` repository with `allow_delete=True`.
+    3. Execute `calculate_diff()`.
+    4. Verify the repository is added to `to_delete`.
     """
     existing = [
         {"repository_name": "repo1", "description": "Old repo1",
@@ -127,7 +167,12 @@ def test_calculate_diff_explicit_delete():
 
 def test_calculate_diff_keyerror():
     """
-    Test that a KeyError is raised if an expected key is missing in existing resources.
+    Ensure `calculate_diff` raises a KeyError when an expected key is missing.
+
+    Steps:
+    1. Define an `existing` repository with an incorrect key (`wrong_key` instead of `repository_name`).
+    2. Define a valid `requested` repository.
+    3. Execute `calculate_diff()` and expect a `KeyError`.
     """
     existing = [
         {"wrong_key": "repo1", "description": "Repo description",
@@ -143,7 +188,7 @@ def test_calculate_diff_keyerror():
 
 
 class Dummy:
-    """Dummy class that only implements model_dump, but not the attribute."""
+    """Dummy class that only implements `model_dump`, but not the required attribute."""
 
     def model_dump(self):
         return {"repository_name": "repo1", "description": "Repo description",
@@ -152,7 +197,12 @@ class Dummy:
 
 def test_calculate_diff_attribute_error():
     """
-    Test that an AttributeError is raised if a requested resource lacks the unique attribute.
+    Ensure `calculate_diff` raises an AttributeError when a requested resource lacks the unique key.
+
+    Steps:
+    1. Define an `existing` repository with valid attributes.
+    2. Define a `requested` repository using a `Dummy` class that lacks the required `repository_name` attribute.
+    3. Execute `calculate_diff()` and expect an `AttributeError`.
     """
     existing = [
         {"repository_name": "repo1", "description": "Repo description",
